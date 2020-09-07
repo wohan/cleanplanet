@@ -7,6 +7,8 @@ target 'cleanplanet' do
   
   permissions_path = '../node_modules/react-native-permissions/ios'
   pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary.podspec"
 
   config = use_native_modules!
 
