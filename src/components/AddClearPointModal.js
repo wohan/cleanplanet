@@ -1,41 +1,45 @@
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
-  Image,
-  Button,
-  Modal,
-  Platform,
+  TextInput,
   TouchableHighlight
 } from 'react-native';
-
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { inject, observer } from 'mobx-react';
 
-const AddClearPointModal: () => React$Node = () => {
+const pointEmpty = {
+    coords: {
+        latitude: 56.483729,
+        longitude: 84.984568,
+        },
+    name: '',
+    description: '',
+    photo: '',
+};
 
-    let [clearPoint, setClearPoint] = React.useState(clearPointEmpty);
+const AddClearPointModal = ({ storePoint }) => {
 
-    updateClearPoint = (field, value) => {
-      setClearPoint({...clearPoint, [field]: value})
+    const { 
+        setShowModalAddPoint,
+        addPoint,
+        } = storePoint;
+
+    let [point, setPoint] = React.useState(pointEmpty);
+
+    updatePoint = (field, value) => {
+      setPoint({...point, [field]: value})
     }
 
     return (
-        <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showModalAddPointMaterial}
-        >
         <View style={styles.modalCenter}>
           <View style={styles.modalView}>
             <TouchableHighlight
               activeOpacity={1}
               underlayColor={'rgb(230, 230, 240)'}
               style={{right: '-32%', padding: 10, borderRadius: 10}}
-              onPress={() => setShowModalAddPointMaterial(false)}
+              onPress={() => setShowModalAddPoint(false)}
             >
               <Text style={{fontSize: 17, color: 'rgb(71, 124, 251)'}}>закрыть</Text>
             </TouchableHighlight>
@@ -45,8 +49,8 @@ const AddClearPointModal: () => React$Node = () => {
               <TextInput
                 style={styles.modalItemInputTextInput}
                 placeholder={'Введите название точки очистки...'}
-                value={clearPoint.name}
-                onChangeText={(value) => updateClearPoint('name', value)}
+                value={point.name}
+                onChangeText={(value) => updatePoint('name', value)}
               />
             </View>
             <View style={styles.modalItemInput}>
@@ -54,8 +58,8 @@ const AddClearPointModal: () => React$Node = () => {
               <TextInput
                 style={styles.modalItemInputTextInput}
                 placeholder={'Введите описание точки очистки...'}
-                value={clearPoint.description}
-                onChangeText={(value) => updateClearPoint('description', value)}
+                value={point.description}
+                onChangeText={(value) => updatePoint('description', value)}
               />
             </View>
             <View style={{marginTop: 20, marginHorizontal: 10}}>
@@ -73,14 +77,13 @@ const AddClearPointModal: () => React$Node = () => {
             <View style={{justifyItems: 'center'}}>
               <TouchableHighlight
                 style={styles.modalButtonAdd}
-                onPress={() => console.warn("onPress")}
+                onPress={() => addPoint(point)}
               >
                 <Text style={{fontSize: 17}}>Добавить точку</Text>
               </TouchableHighlight>
             </View>
           </View>
         </View>
-      </Modal>
     )
 }
 
@@ -186,4 +189,4 @@ const styles = StyleSheet.create({
     },
   });
 
-  export default AddClearPointModal;
+  export default inject('storePoint')(observer(AddClearPointModal));

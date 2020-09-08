@@ -1,5 +1,5 @@
 import React from 'react';
-import {StorePoint} from './src/stores/StorePoint';
+import StorePoint from './src/stores/StorePoint';
 import { observer, Provider } from 'mobx-react';
 import HomePage from './src/pages/HomePage';
 

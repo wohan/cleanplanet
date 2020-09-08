@@ -1,85 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
   StatusBar,
   Image,
   Button,
   Modal,
-  Platform,
-  TouchableHighlight
 } from 'react-native';
 
-import {AddClearPointModal} from '../components/AddClearPointModal';
-
+import AddClearPointModal from '../components/AddClearPointModal';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-
-import MapView, { PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
-
-import Geolocation from '@react-native-community/geolocation';
-
-import {request, PERMISSIONS} from 'react-native-permissions';
-import { TextInput } from 'react-native-gesture-handler';
-
-const clearPointEmpty = {
-  name: '',
-  description: '',
-  photo: ''
-};
+import MapView, { Marker, Callout } from 'react-native-maps';
+import { inject, observer } from 'mobx-react';
 
 const coordinateTsk = {
-  latitude: 56.483729,
-  longitude: 84.984568,
-  latitudeDelta: 0.05,
-  longitudeDelta: 0.05,
+    latitude: 56.483729,
+    longitude: 84.984568,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
 };
 
-const HomePage: () => React$Node = () => {
+const HomePage = ({ storePoint }) => {
+
+    const { 
+        showModalAddPoint,
+        currentPosition,
+        setShowModalAddPoint,
+        setCoordinateNewPoint,
+        getPermissionLocale,
+        } = storePoint;
 
     React.useEffect(() => {
-      getPermissionLocale();
-    }, [coordinate])
-  
-    let [coordinate, setCoordinate] = React.useState({
-        latitude: null,
-        longitude: null,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-    });
-  
-    let [showModalAddPointMaterial, setShowModalAddPointMaterial] = React.useState(false);
-  
-    getCurrentPosition = () => {
-      Geolocation.getCurrentPosition(info => {
-        console.warn(info)
-        setCoordinate({
-          ...coordinate,
-          latitude: info.coords.latitude,
-          longitude: info.coords.longitude,
-        });
-        console.warn(JSON.stringify(coordinate));
-      }
-      );
-    }
-  
-    getPermissionLocale = async () => {
-      console.warn("getPermissionLocale ios");
-      if(Platform.OS === 'ios') {
-        var response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
-        if (response === 'granted') {
-          getCurrentPosition();
-        }
-      } else {
-        var response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-        if (response === 'granted') {
-          getCurrentPosition();
-        }
-      }
-    }
-  
+        getPermissionLocale();
+        console.warn('showModalAddPoint useEffect', showModalAddPoint);
+    }, [currentPosition, showModalAddPoint])
+ 
     return (
       <>
         <StatusBar barStyle="dark-content" />
@@ -88,16 +45,15 @@ const HomePage: () => React$Node = () => {
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Button title={'Меню'}/>
             <Text style={{fontSize: 25, fontWeight: '600', color: 'blue'}}>Чистая Планета</Text>
-            <Button onPress={() => setShowModalAddPointMaterial(!showModalAddPointMaterial)} title={'+'}/>
+            <Button onPress={() => setShowModalAddPoint(true)} title={'+'}/>
           </View>
           <MapView
             style={{ height: '100%'}}
-            region={coordinate}
+            region={coordinateTsk}
           >
-            {coordinate.latitude && 
               <Marker draggable
-                coordinate={coordinate}
-                onDragEnd={(e) => setCoordinate(e.nativeEvent.coordinate)}
+                coordinate={coordinateTsk}
+                onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
                 title='Томск'
               >
                 <Callout onPress={() => console.warn("onPress")}>
@@ -108,8 +64,14 @@ const HomePage: () => React$Node = () => {
                   <Button title='go trash'></Button>
                 </Callout>
               </Marker>
-            }
           </MapView>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showModalAddPoint}
+          >
+            <AddClearPointModal />
+          </Modal>
           </View>
         </SafeAreaView>
       </>
@@ -217,5 +179,5 @@ const HomePage: () => React$Node = () => {
       height: '100%'
     },
   });
-  
-  export default HomePage;
+
+export default inject('storePoint')(observer(HomePage));
