@@ -3,6 +3,7 @@ import {Platform} from 'react-native';
 import { observable, computed, action } from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
+import {firebaseApp} from './firebaseApp';
 
 const coordinateTsk = {
     latitude: 56.483729,
@@ -70,7 +71,7 @@ class StorePoint {
     @action.bound
     async getPermissionLocale() {
         console.warn("getPermissionLocale ios");
-        if(Platform.OS === 'ios') {
+        if (Platform.OS === 'ios') {
           const response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
           if (response === 'granted') {
             this.getCurrentPosition();
@@ -82,7 +83,6 @@ class StorePoint {
           }
         }
       }
-
 }
 
 export default new StorePoint();

@@ -42,10 +42,10 @@ const HomePage = ({ storePoint }) => {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView>
           <View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#AFEEEE'}}>
             <Button title={'Меню'}/>
-            <Text style={{fontSize: 25, fontWeight: '600', color: 'blue'}}>Чистая Планета</Text>
-            <Button onPress={() => setShowModalAddPoint(true)} title={'+'}/>
+            <Text style={{fontSize: 21, paddingTop: 5, fontWeight: '600', color: 'rgb(74, 128, 252)'}}>Чистая Планета</Text>
+            <Button style={{paddingRight: 10, size: 21}} onPress={() => setShowModalAddPoint(true)} title={'+'}/>
           </View>
           <MapView
             style={{ height: '100%'}}
