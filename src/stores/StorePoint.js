@@ -72,9 +72,17 @@ class StorePoint {
     async getPermissionLocale() {
         console.warn("getPermissionLocale ios");
         if (Platform.OS === 'ios') {
-          const response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+          const response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+          const responseCamera = await request(PERMISSIONS.IOS.CAMERA);
+          const responsePhotoLibrary = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
           if (response === 'granted') {
             this.getCurrentPosition();
+          }
+          if (responseCamera === 'granted') {
+            console.warn("responseCamera ios");
+          }
+          if (responsePhotoLibrary === 'granted') {
+            console.warn("responsePhotoLibrary ios");
           }
         } else {
             const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
@@ -82,6 +90,58 @@ class StorePoint {
             this.getCurrentPosition();
           }
         }
+      }
+
+      @action.bound
+      async uploadPoints(text, localUri) {
+        console.warn('job uploadPoints');
+        const remoteUri = await this.uploadPhotoAsync(localUri);
+        return new Promise((res, rej) => {
+          firebaseApp
+            .collection('points')
+            .add({
+              text,
+              id: "points id",
+              image: remoteUri
+            })
+            .then(ref => {
+              console.warn(JSON.stringify(ref));
+              res(ref)
+            })
+            .catch(error => {
+              console.warn(JSON.stringify(error));
+              rej(error)
+            });
+        });
+      }
+
+      uploadPhotoAsync = async uri => {
+        console.warn('job uploadPhotoAsync');
+        const path = `points/${"idPoint"}/${Date.now()}.jpg`;
+
+        return new Promise(async (res, rej) => {
+          const response = await fetch(uri);
+          const file = await response.blob();
+
+          let upload = firebaseApp
+            .storage()
+            .ref(path)
+            .put(file);
+
+          upload.on(
+            "state_changed",
+            snapshot => {},
+            err => {
+              console.warn(JSON.stringify(err));
+              rej(err);
+            },
+            async () => {
+              const url = await upload.snapshot.ref.getDownloadURL();
+              console.warn(JSON.stringify(url));
+              res(url);
+            }
+          );
+        })
       }
 }
 

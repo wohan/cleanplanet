@@ -4,10 +4,12 @@ import {
   View,
   Text,
   TextInput,
-  TouchableHighlight
+  TouchableHighlight,
+  Image
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { inject, observer } from 'mobx-react';
+import ImagePicker from 'react-native-image-picker';
 
 const pointEmpty = {
     coords: {
@@ -19,17 +21,35 @@ const pointEmpty = {
     photo: '',
 };
 
+const options = {
+  title: 'Выберите изображение',
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+};
+
 const AddClearPointModal = ({ storePoint }) => {
 
     const { 
         setShowModalAddPoint,
         addPoint,
+        uploadPoints
         } = storePoint;
 
     let [point, setPoint] = React.useState(pointEmpty);
+    let [uriPhotos, setUriPhotos] = React.useState([]);
 
     updatePoint = (field, value) => {
       setPoint({...point, [field]: value})
+    }
+
+    addPhotos = () => {
+      ImagePicker.showImagePicker(options, (response) => {
+        if (!response.cancelled) {
+          setUriPhotos([ ...uriPhotos, response.uri]);
+        }
+      });
     }
 
     return (
@@ -67,17 +87,24 @@ const AddClearPointModal = ({ storePoint }) => {
               <View style={styles.modalViewAddPhoto}>
                 <TouchableHighlight
                   style={styles.modalButtonAddPhoto}
-                  onPress={() => console.warn("onPress")}
+                  onPress={() => addPhotos()}
                 >
                   <Text style={{fontSize: 17}}>Добавить фото</Text>
                 </TouchableHighlight>
-                <Text style={{marginTop: 15, fontSize: 16}}>{'Добавленно 5 фото'}</Text>
+                <Text style={{marginTop: 15, fontSize: 16}}>{`Добавленно ${uriPhotos.length} фото`}</Text>
               </View>
+              <View style={styles.itemHorizontal}>
+                {uriPhotos.map(uriPhoto =>
+                  <Image source={{uri: uriPhoto}} style={{width: 100, height: 100}}></Image>
+                )}
+              </View>
+            </View>
+            <View style={{}}>
             </View>
             <View style={{justifyItems: 'center'}}>
               <TouchableHighlight
                 style={styles.modalButtonAdd}
-                onPress={() => addPoint(point)}
+                onPress={() => uploadPoints(point.description, uriPhotos[0])}
               >
                 <Text style={{fontSize: 17}}>Добавить точку</Text>
               </TouchableHighlight>
@@ -92,6 +119,10 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
+    },
+    itemHorizontal: {
+      flexDirection: "row",
+      padding: 10,
     },
     modalView: {
       backgroundColor: 'white',
@@ -176,16 +207,36 @@ const styles = StyleSheet.create({
       paddingRight: 12,
       textAlign: 'right',
     },
-    container: {
-      ...StyleSheet.absoluteFillObject,
-      height: 800,
-      width: 400,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-    },
+    // container: {
+    //   ...StyleSheet.absoluteFillObject,
+    //   height: 800,
+    //   width: 400,
+    //   justifyContent: 'flex-end',
+    //   alignItems: 'center',
+    // },
     map: {
       ...StyleSheet.absoluteFillObject,
       height: '100%'
+    },
+
+    container: {
+      flex: 1,
+      flexDirection: 'column',
+      backgroundColor: 'black',
+    },
+    preview: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    },
+    capture: {
+      flex: 0,
+      backgroundColor: '#fff',
+      borderRadius: 5,
+      padding: 15,
+      paddingHorizontal: 20,
+      alignSelf: 'center',
+      margin: 20,
     },
   });
 
