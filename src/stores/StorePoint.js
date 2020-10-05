@@ -34,6 +34,7 @@ class StorePoint {
     @observable currentPosition = { ...coordinateTsk };
     @observable currentPositionNewPoint = { latitude: null, longitude: null, ...deltaMapView };
     @observable showModalAddPoint = false;
+    @observable showMarkerAddPoint = false;
     @observable points = [];
     @observable pointsToAdd = [];
 
@@ -49,6 +50,11 @@ class StorePoint {
     @action.bound
     setShowModalAddPoint(show) {
         this.showModalAddPoint = show;
+    }
+
+    @action.bound
+    setShowMarkerAddPoint(show) {
+        this.showMarkerAddPoint = show;
     }
 
     @action.bound

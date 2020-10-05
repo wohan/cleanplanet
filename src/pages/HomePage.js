@@ -24,11 +24,14 @@ const coordinateTsk = {
 
 const HomePage = ({ storePoint }) => {
 
-    const { 
+    const {
         showModalAddPoint,
+        showMarkerAddPoint,
         currentPosition,
         setShowModalAddPoint,
+        setShowMarkerAddPoint,
         setCoordinateNewPoint,
+        coordinateNewPoint,
         getPermissionLocale,
         } = storePoint;
 
@@ -36,42 +39,61 @@ const HomePage = ({ storePoint }) => {
         getPermissionLocale();
         console.warn('showModalAddPoint useEffect', showModalAddPoint);
     }, [currentPosition, showModalAddPoint])
+
+    createMarkerAddNewPoint = () => {
+      return (
+        <Marker
+          draggable
+          coordinate={coordinateTsk}
+          onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
+          title='Томск'
+        >
+          <Callout>
+            <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
+              <Button onPress={() => setShowMarkerAddPoint(false)} title='Отмена'></Button>
+              <Button onPress={() => setShowModalAddPoint(true)} title='Добавить описание'></Button>
+            </View>
+          </Callout>
+        </Marker>
+      );
+    }
  
     return (
       <>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView>
           <View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#AFEEEE'}}>
-            <Button title={'Меню'}/>
-            <Text style={{fontSize: 21, paddingTop: 5, fontWeight: '600', color: 'rgb(74, 128, 252)'}}>Чистая Планета</Text>
-            <Button style={{paddingRight: 10, size: 21}} onPress={() => setShowModalAddPoint(true)} title={'+'}/>
-          </View>
-          <MapView
-            style={{ height: '100%'}}
-            region={coordinateTsk}
-          >
-              <Marker draggable
-                coordinate={coordinateTsk}
-                onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
-                title='Томск'
-              >
-                <Callout onPress={() => console.warn("onPress")}>
-                  <Image
-                    style={{height: 100}}
-                    source={require('../drawable/im1.jpg')} />
-                  <Text>Классный город</Text>
-                  <Button title='go trash'></Button>
-                </Callout>
-              </Marker>
-          </MapView>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showModalAddPoint}
-          >
-            <AddClearPointModal />
-          </Modal>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#AFEEEE'}}>
+              <Button title={'Меню'}/>
+              <Text style={{fontSize: 21, paddingTop: 5, fontWeight: '600', color: 'rgb(74, 128, 252, 0.6)'}}>
+                Чистая Планета
+              </Text>
+              <Button
+                style={{paddingRight: 10, size: 21}}
+                onPress={() => setShowMarkerAddPoint(true)}
+                title={'+'}
+              />
+            </View>
+            {showMarkerAddPoint &&
+              <View style={{alignItems: 'center'}}>
+                <Text style={{margin: 10, fontWeight: '400'}}>
+                  Перенесите указатель на место на карте где находится точка очистки и добавьте описание.
+                </Text>
+              </View>
+            }
+            <MapView
+              style={{ height: '100%'}}
+              region={coordinateTsk}
+            >
+              {showMarkerAddPoint && createMarkerAddNewPoint()}
+            </MapView>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={showModalAddPoint}
+            >
+              <AddClearPointModal />
+            </Modal>
           </View>
         </SafeAreaView>
       </>
