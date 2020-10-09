@@ -3,13 +3,25 @@ import {Platform} from 'react-native';
 import { observable, computed, action } from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
-import {firebaseApp} from './firebaseApp';
+// import {firebaseApp} from './firebaseApp';
+import firebase from 'firebase';
+import { firebaseApp } from './firebaseApp';
 
 const coordinateTsk = {
     latitude: 56.483729,
     longitude: 84.984568,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
+};
+
+var firebaseConfig = {
+  apiKey: "AIzaSyB3duX56E6X9eS7a4GtLxrVT8h81LfevWU",
+  authDomain: "cleanplanet-58101.firebaseapp.com",
+  databaseURL: "https://cleanplanet-58101.firebaseio.com",
+  projectId: "cleanplanet-58101",
+  storageBucket: "cleanplanet-58101.appspot.com",
+  messagingSenderId: "924718130720",
+  appId: "1:924718130720:web:50bf2ec9909df46da47e45"
 };
 
 const deltaMapView = {
@@ -32,19 +44,19 @@ const pointsOffLine = [
 class StorePoint {
     //@observable currentPosition = { latitude: null, longitude: null, ...deltaMapView };
     @observable currentPosition = { ...coordinateTsk };
-    @observable currentPositionNewPoint = { latitude: null, longitude: null, ...deltaMapView };
+    @observable currentPositionNewPoint = { latitude: null, longitude: null };
     @observable showModalAddPoint = false;
     @observable showMarkerAddPoint = false;
     @observable points = [];
     @observable pointsToAdd = [];
 
+    // constructor() {
+    //   firebase.initializeApp(firebaseConfig);
+    // }
+
     @action.bound
     setCoordinateNewPoint(coordinate) {
-        this.currentPositionNewPoint = {
-            ...this.currentPosition,
-            ...coordinate
-        };
-        // this.currentPositionNewPoint = this.currentPosition;
+        this.currentPositionNewPoint = coordinate;
     }
 
     @action.bound
@@ -59,9 +71,7 @@ class StorePoint {
 
     @action.bound
     addPoint(pointToAdd) {
-        console.warn(JSON.stringify(pointToAdd));
         this.pointsToAdd.push(pointToAdd);
-        console.warn(JSON.stringify(this.pointsToAdd));
     }
 
     @action.bound
@@ -76,7 +86,6 @@ class StorePoint {
 
     @action.bound
     async getPermissionLocale() {
-        console.warn("getPermissionLocale ios");
         if (Platform.OS === 'ios') {
           const response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
           const responseCamera = await request(PERMISSIONS.IOS.CAMERA);
@@ -84,11 +93,11 @@ class StorePoint {
           if (response === 'granted') {
             this.getCurrentPosition();
           }
-          if (responseCamera === 'granted') {
-            console.warn("responseCamera ios");
+          if (responseCamera !== 'granted') {
+            console.warn("Доступ к камере не предоставлен!");
           }
-          if (responsePhotoLibrary === 'granted') {
-            console.warn("responsePhotoLibrary ios");
+          if (responsePhotoLibrary !== 'granted') {
+            console.warn("Доступ к библиотеке не предоставлен!");
           }
         } else {
             const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
@@ -100,36 +109,34 @@ class StorePoint {
 
       @action.bound
       async uploadPoints(text, localUri) {
-        console.warn('job uploadPoints');
         const remoteUri = await this.uploadPhotoAsync(localUri);
-        return new Promise((res, rej) => {
-          firebaseApp
-            .collection('points')
-            .add({
-              text,
-              id: "points id",
-              image: remoteUri
-            })
-            .then(ref => {
-              console.warn(JSON.stringify(ref));
-              res(ref)
-            })
-            .catch(error => {
-              console.warn(JSON.stringify(error));
-              rej(error)
-            });
-        });
+        // return new Promise((res, rej) => {
+        //   firebaseApp
+        //     .collection('points')
+        //     .add({
+        //       text,
+        //       coordinate: this.currentPositionNewPoint,
+        //       id: "points id",
+        //       image: remoteUri
+        //     })
+        //     .then(ref => {
+        //       console.warn(JSON.stringify(ref));
+        //       res(ref)
+        //     })
+        //     .catch(error => {
+        //       console.warn(JSON.stringify(error));
+        //       rej(error)
+        //     });
+        // });
       }
 
       uploadPhotoAsync = async uri => {
-        console.warn('job uploadPhotoAsync');
         const path = `points/${"idPoint"}/${Date.now()}.jpg`;
-
         return new Promise(async (res, rej) => {
           const response = await fetch(uri);
           const file = await response.blob();
 
-          let upload = firebaseApp
+          let upload = firebase
             .storage()
             .ref(path)
             .put(file);

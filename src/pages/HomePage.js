@@ -37,8 +37,7 @@ const HomePage = ({ storePoint }) => {
 
     React.useEffect(() => {
         getPermissionLocale();
-        console.warn('showModalAddPoint useEffect', showModalAddPoint);
-    }, [currentPosition, showModalAddPoint])
+    }, [currentPosition, showModalAddPoint]);
 
     createMarkerAddNewPoint = () => {
       return (
@@ -60,23 +59,22 @@ const HomePage = ({ storePoint }) => {
  
     return (
       <>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar/>
         <SafeAreaView>
           <View>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#AFEEEE'}}>
-              <Button title={'Меню'}/>
-              <Text style={{fontSize: 21, paddingTop: 5, fontWeight: '600', color: 'rgb(74, 128, 252, 0.6)'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={{fontSize: 22, paddingTop: 5, paddingLeft: 10, fontWeight: '600', color: '#02cdfa'}}>
                 Чистая Планета
               </Text>
               <Button
                 style={{paddingRight: 10, size: 21}}
                 onPress={() => setShowMarkerAddPoint(true)}
-                title={'+'}
+                title={'Добавить точку'}
               />
             </View>
             {showMarkerAddPoint &&
-              <View style={{alignItems: 'center'}}>
-                <Text style={{margin: 10, fontWeight: '400'}}>
+              <View style={{alignItems: 'center', borderRadius: 10, backgroundColor: '#78e6ff'}}>
+                <Text style={{margin: 10, fontWeight: '400', fontSize: 17}}>
                   Перенесите указатель на место на карте где находится точка очистки и добавьте описание.
                 </Text>
               </View>

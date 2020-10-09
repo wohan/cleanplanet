@@ -88,6 +88,7 @@ const AddClearPointModal = ({ storePoint }) => {
                 <TouchableHighlight
                   style={styles.modalButtonAddPhoto}
                   onPress={() => addPhotos()}
+                  disabled={uriPhotos.length > 2}
                 >
                   <Text style={{fontSize: 17}}>Добавить фото</Text>
                 </TouchableHighlight>
