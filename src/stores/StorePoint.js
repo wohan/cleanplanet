@@ -5,7 +5,7 @@ import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
 // import {firebaseApp} from './firebaseApp';
 import firebase from 'firebase';
-import { firebaseApp } from './firebaseApp';
+//import { firebaseApp } from './firebaseApp';
 
 const coordinateTsk = {
     latitude: 56.483729,
@@ -131,30 +131,30 @@ class StorePoint {
       }
 
       uploadPhotoAsync = async uri => {
-        const path = `points/${"idPoint"}/${Date.now()}.jpg`;
-        return new Promise(async (res, rej) => {
-          const response = await fetch(uri);
-          const file = await response.blob();
+        // const path = `points/${"idPoint"}/${Date.now()}.jpg`;
+        // return new Promise(async (res, rej) => {
+        //   const response = await fetch(uri);
+        //   const file = await response.blob();
 
-          let upload = firebase
-            .storage()
-            .ref(path)
-            .put(file);
+        //   let upload = firebase
+        //     .storage()
+        //     .ref(path)
+        //     .put(file);
 
-          upload.on(
-            "state_changed",
-            snapshot => {},
-            err => {
-              console.warn(JSON.stringify(err));
-              rej(err);
-            },
-            async () => {
-              const url = await upload.snapshot.ref.getDownloadURL();
-              console.warn(JSON.stringify(url));
-              res(url);
-            }
-          );
-        })
+        //   upload.on(
+        //     "state_changed",
+        //     snapshot => {},
+        //     err => {
+        //       console.warn(JSON.stringify(err));
+        //       rej(err);
+        //     },
+        //     async () => {
+        //       const url = await upload.snapshot.ref.getDownloadURL();
+        //       console.warn(JSON.stringify(url));
+        //       res(url);
+        //     }
+        //   );
+        // })
       }
 }
 

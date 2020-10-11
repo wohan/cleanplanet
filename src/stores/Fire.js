@@ -21,6 +21,7 @@ class Fire {
     }
 
     async uploadPoints(text, localUri) {
+        console.warn("uploadPoints");
       const remoteUri = await this.uploadPhotoAsync(localUri);
       // return new Promise((res, rej) => {
       //   firebaseApp

@@ -45,7 +45,7 @@ const HomePage = ({ storePoint }) => {
           draggable
           coordinate={coordinateTsk}
           onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
-          title='Томск'
+          title='Точка очистки'
         >
           <Callout>
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>

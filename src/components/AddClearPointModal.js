@@ -10,6 +10,7 @@ import {
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { inject, observer } from 'mobx-react';
 import ImagePicker from 'react-native-image-picker';
+import Fire from '../stores/Fire';
 
 const pointEmpty = {
     coords: {
@@ -63,11 +64,12 @@ const AddClearPointModal = ({ storePoint }) => {
             >
               <Text style={{fontSize: 17, color: 'rgb(71, 124, 251)'}}>закрыть</Text>
             </TouchableHighlight>
-            <Text style={styles.modalItemInputText}>Новая точка очистки</Text>
+            <Text style={styles.modalItemInputText, {fontSize: 22}}>Новая точка очистки</Text>
             <View style={styles.modalItemInput}>
               <Text style={styles.modalItemInputText}>Введите название точки очистки</Text>
               <TextInput
                 style={styles.modalItemInputTextInput}
+                maxLength={50}
                 placeholder={'Введите название точки очистки...'}
                 value={point.name}
                 onChangeText={(value) => updatePoint('name', value)}
@@ -76,9 +78,11 @@ const AddClearPointModal = ({ storePoint }) => {
             <View style={styles.modalItemInput}>
               <Text style={styles.modalItemInputText}>Введите описание точки очистки</Text>
               <TextInput
+                maxLength={300}
                 style={styles.modalItemInputTextInput}
                 placeholder={'Введите описание точки очистки...'}
                 value={point.description}
+                multiline={true}
                 onChangeText={(value) => updatePoint('description', value)}
               />
             </View>
@@ -105,7 +109,8 @@ const AddClearPointModal = ({ storePoint }) => {
             <View style={{justifyItems: 'center'}}>
               <TouchableHighlight
                 style={styles.modalButtonAdd}
-                onPress={() => uploadPoints(point.description, uriPhotos[0])}
+                // onPress={() => uploadPoints(point.description, uriPhotos[0])}
+                onPress={() => Fire.shared.uploadPoints(point.description, uriPhotos[0])}
               >
                 <Text style={{fontSize: 17}}>Добавить точку</Text>
               </TouchableHighlight>
@@ -145,7 +150,8 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       marginTop: 10,
       padding: 5,
-      fontSize: 17
+      fontSize: 17,
+      width: 310,
     },
     modalButtonAddPhoto: {
       paddingHorizontal: 10,
