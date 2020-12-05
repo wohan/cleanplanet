@@ -23,24 +23,24 @@ class Fire {
     async uploadPoints(text, localUri) {
         console.warn("uploadPoints");
       const remoteUri = await this.uploadPhotoAsync(localUri);
-      // return new Promise((res, rej) => {
-      //   firebaseApp
-      //     .collection('points')
-      //     .add({
-      //       text,
-      //       coordinate: this.currentPositionNewPoint,
-      //       id: "points id",
-      //       image: remoteUri
-      //     })
-      //     .then(ref => {
-      //       console.warn(JSON.stringify(ref));
-      //       res(ref)
-      //     })
-      //     .catch(error => {
-      //       console.warn(JSON.stringify(error));
-      //       rej(error)
-      //     });
-      // });
+      return new Promise((res, rej) => {
+        firebaseApp
+          .collection('points')
+          .add({
+            text,
+            coordinate: this.currentPositionNewPoint,
+            id: "points id",
+            image: remoteUri
+          })
+          .then(ref => {
+            console.warn(JSON.stringify(ref));
+            res(ref)
+          })
+          .catch(error => {
+            console.warn(JSON.stringify(error));
+            rej(error)
+          });
+      });
     }
 
     uploadPhotoAsync = async uri => {
