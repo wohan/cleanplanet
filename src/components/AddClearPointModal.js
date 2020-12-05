@@ -121,10 +121,7 @@ const AddClearPointModal = ({storePoint}) => {
         <View style={{justifyItems: 'center'}}>
           <TouchableHighlight
             style={styles.modalButtonAdd}
-            // onPress={() => uploadPoints(point.description, uriPhotos[0])}
-            onPress={() =>
-              uploadPoints(point.name, point.description, uriPhotos[0])
-            }>
+            onPress={() => uploadPoints(point, uriPhotos[0])}>
             <Text style={{fontSize: 17}}>Добавить точку</Text>
           </TouchableHighlight>
         </View>

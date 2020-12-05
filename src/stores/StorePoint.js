@@ -3,9 +3,8 @@ import {observable, computed, action} from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import {firebaseApp} from './firebaseApp';
-import {firebase} from 'firebase';
-import RNFetchBlob from 'rn-fetch-blob';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 
 const coordinateTsk = {
   latitude: 56.483729,
@@ -28,6 +27,8 @@ const pointsOffLine = [
     photo: 'ссылки на фото в fireStore',
   },
 ];
+
+const POINTS = 'points';
 
 class StorePoint {
   @observable currentPosition = {...coordinateTsk};
@@ -91,192 +92,49 @@ class StorePoint {
   }
 
   @action.bound
-  async uploadPoints(name, description, localUri) {
-    // console.warn("job uploadPoints", text, localUri);
-
+  async uploadPoints(point, localUri) {
     const date = Date.now();
+    const id = this.getUuidv4();
+    const path = `points/${id}/${date}.jpg`;
 
-    const path = `points/${'idPoint'}/${date}.jpg`;
+    await this.uploadPhotoAsync(localUri, path);
 
-    await this.uploadPhotoAsync3(localUri, path);
+    const {name, description} = point;
 
-    let db = firebaseApp.firestore();
-
-    db.collection('points')
+    firestore()
+      .collection(POINTS)
       .add({
+        id,
         description,
         name,
         ...this.currentPositionNewPoint,
-        id: 'points id',
         photos: [path],
       })
       .then((ref) => {
-        console.warn(JSON.stringify(ref));
+        console.warn('then', JSON.stringify(ref));
       })
       .catch((error) => {
-        console.warn(JSON.stringify(error));
+        console.warn('error in AddPoints1', error);
       });
   }
 
-  // const remoteUri = await this.uploadPhotoAsync(localUri);
-  // return new Promise((res, rej) => {
-  //   firebaseApp
-  //     .collection('points')
-  //     .add({
-  //       text,
-  //       coordinate: this.currentPositionNewPoint,
-  //       id: "points id",
-  //      // image: remoteUri
-  //     })
-  //     .then(ref => {
-  //       console.warn(JSON.stringify(ref));
-  //       res(ref)
-  //     })
-  //     .catch(error => {
-  //       console.warn(JSON.stringify(error));
-  //       rej(error)
-  //     });
-  // });
+  getUuidv4 = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
+      c,
+    ) {
+      var r = (Math.random() * 16) | 0,
+        v = c == 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
 
-  uploadPhotoAsync3 = async (uri, path) => {
+  uploadPhotoAsync = async (uri, path) => {
     const reference = storage().ref(path);
     try {
       await reference.putFile(uri);
     } catch (e) {
-      console.warn(JSON.stringify(e));
+      console.warn('Ошибка при загрузке фото');
     }
-  };
-
-  @action.bound
-  uploadPhotoAsync2 = async (uri, path) => {
-    return new Promise(async (res, rej) => {
-      var response = null;
-      var refChild = null;
-      var uploadRef = null;
-
-      try {
-        uploadRef = firebaseApp.storage().ref();
-      } catch (e) {
-        console.warn('uploadRef1 ' + e);
-      }
-
-      try {
-        console.warn('fetch(uri)', uri);
-        response = await RNFetchBlob.fetch('GET', uri);
-        console.warn('get response');
-      } catch (e) {
-        console.warn('response fetch  ' + e);
-      }
-
-      try {
-        refChild = uploadRef.child(path);
-        console.warn('get refChild');
-      } catch (e) {
-        console.warn('refChild ' + e);
-      }
-
-      try {
-        console.warn('put in refChild');
-        refChild.put(response).then((request) => {
-          // res(request);
-          console.warn('refChild.put request ', JSON.stringify(request));
-        });
-      } catch (e) {
-        console.warn('refChild.put error ' + JSON.stringify(e));
-      }
-    });
-  };
-
-  upoloadPhoto2 = async (uri) => {
-    var storageRef = null;
-    var mountainsRef = null;
-    const path = `points/${'idPoint'}/${Date.now()}.jpg`;
-
-    try {
-      storageRef = firebaseApp.storage().ref();
-    } catch (e) {
-      console.log('snapshot1 ', JSON.stringify(e));
-    }
-
-    try {
-      mountainsRef = storageRef.child(path);
-    } catch (e) {
-      console.log('snapshot2 ', JSON.stringify(e));
-    }
-
-    try {
-      await fetch(uri).then((file) => {
-        mountainsRef.put(file.blob()).then(function (snapshot) {
-          console.log('snapshot3 ', JSON.stringify(snapshot));
-        });
-      });
-
-      RNFetchBlob.fetch(
-        'PUT',
-        url,
-        {
-          'Content-Type': 'multipart/form-data',
-        },
-        [
-          {
-            name: 'file',
-            filename: 'photo.jpg',
-            type: 'image/png',
-            data: RNFetchBlob.wrap(src),
-          },
-        ],
-      )
-        .then((file) => {
-          mountainsRef.put(file.blob()).then(function (snapshot) {
-            console.log('snapshot3 ', JSON.stringify(snapshot));
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch (e) {
-      console.log('snapshot3 ', e);
-    }
-  };
-
-  uploadPhotoAsync = async (uri) => {
-    const path = `points/${'idPoint'}/${Date.now()}.jpg`;
-    return new Promise(async (res, rej) => {
-      var response = null;
-      try {
-        console.warn(uri);
-        response = await fetch(uri);
-      } catch (e) {
-        console.warn('uploadPhotoAsync1' + e);
-      }
-
-      var file = null;
-      try {
-        file = await response.blob();
-      } catch (e) {
-        console.warn('uploadPhotoAsync12' + e);
-      }
-      var upload = null;
-      try {
-        upload = firebase.storage().ref(path).put(file);
-      } catch (e) {
-        console.warn('uploadPhotoAsync2' + e);
-      }
-
-      upload.on(
-        'state_changed',
-        (snapshot) => {},
-        (err) => {
-          console.warn(JSON.stringify(err));
-          rej(err);
-        },
-        async () => {
-          const url = await upload.snapshot.ref.getDownloadURL();
-          console.warn(JSON.stringify(url));
-          res(url);
-        },
-      );
-    });
   };
 }
 
