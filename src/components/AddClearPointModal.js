@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -30,10 +30,7 @@ const options = {
 };
 
 const AddClearPointModal = ({storePoint}) => {
-  const {
-    setShowModalAddPoint,
-    uploadPoints,
-  } = storePoint;
+  const {setShowModalAddPoint, uploadPoints} = storePoint;
 
   let [point, setPoint] = React.useState(pointEmpty);
   let [uriPhotos, setUriPhotos] = React.useState([]);

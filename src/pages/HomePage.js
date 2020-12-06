@@ -13,6 +13,7 @@ import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const coordinateTsk = {
   latitude: 56.483729,
@@ -102,6 +103,12 @@ const HomePage = ({storePoint}) => {
             animationType="slide"
             transparent={true}
             visible={showModalAddPoint}>
+            <Spinner
+              visible={loading}
+              textContent={'Загрузка...'}
+              textStyle={styles.spinnerTextStyle}
+              indicatorStyle={styles.spinnerTextStyle}
+            />
             <AddClearPointModal />
           </Modal>
         </View>
@@ -208,6 +215,9 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
     height: '100%',
+  },
+  spinnerTextStyle: {
+    color: '#ff0000',
   },
 });
 

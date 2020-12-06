@@ -1,6 +1,4 @@
-import firebase from '@react-native-firebase/app';
-
-var firebaseConfig = {
+export const firebaseConfig = {
   apiKey: 'AIzaSyB3duX56E6X9eS7a4GtLxrVT8h81LfevWU',
   authDomain: 'cleanplanet-58101.firebaseapp.com',
   databaseURL: 'https://cleanplanet-58101.firebaseio.com',
@@ -9,5 +7,3 @@ var firebaseConfig = {
   messagingSenderId: '924718130720',
   appId: '1:924718130720:web:50bf2ec9909df46da47e45',
 };
-
-export const firebaseApp = firebase.initializeApp(firebaseConfig);

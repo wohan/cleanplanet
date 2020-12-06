@@ -4,6 +4,8 @@ import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
+import firebase from '@react-native-firebase/app';
+import {firebaseConfig} from './firebaseApp';
 
 const coordinateTsk = {
   latitude: 56.483729,
@@ -18,6 +20,10 @@ const deltaMapView = {
 const POINTS = 'points';
 
 class StorePoint {
+  constructor() {
+    firebase.initializeApp(firebaseConfig);
+  }
+
   @observable currentPosition = {...coordinateTsk};
   @observable currentPositionNewPoint = {latitude: null, longitude: null};
   @observable showModalAddPoint = false;
@@ -97,7 +103,7 @@ class StorePoint {
         await this.uploadPhotoAsync(uri, paths[index]);
       }
 
-      firestore()
+      await firestore()
         .collection(POINTS)
         .add({
           id,
@@ -111,7 +117,10 @@ class StorePoint {
         })
         .catch((error) => {
           console.warn('error in AddPoints1', error);
+          console.warn('error in AddPoints2', JSON.stringify(error));
         });
+    } catch (e) {
+      console.warn('error in AddPoints1 catch', e);
     } finally {
       this.loading = false;
       this.showModalAddPoint = false;
