@@ -1,8 +1,7 @@
 import {Platform} from 'react-native';
-import {observable, computed, action} from 'mobx';
+import {observable, action} from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
 import {request, PERMISSIONS} from 'react-native-permissions';
-import {firebaseApp} from './firebaseApp';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 
@@ -16,18 +15,6 @@ const deltaMapView = {
   longitudeDelta: 0.05,
 };
 
-const pointsOffLine = [
-  {
-    coords: {
-      latitude: 56.483729,
-      longitude: 84.984568,
-    },
-    name: 'Наименование точки уборки',
-    description: 'Описание точки убоки',
-    photo: 'ссылки на фото в fireStore',
-  },
-];
-
 const POINTS = 'points';
 
 class StorePoint {
@@ -37,6 +24,7 @@ class StorePoint {
   @observable showMarkerAddPoint = false;
   @observable points = [];
   @observable pointsToAdd = [];
+  @observable loading = false;
 
   @action.bound
   setCoordinateNewPoint(coordinate) {
@@ -56,6 +44,8 @@ class StorePoint {
   @action.bound
   addPoint(pointToAdd) {
     this.pointsToAdd.push(pointToAdd);
+    this.showModalAddPoint = false;
+    this.showMarkerAddPoint = false;
   }
 
   @action.bound
@@ -95,27 +85,38 @@ class StorePoint {
   async uploadPoints(point, localUri) {
     const date = Date.now();
     const id = this.getUuidv4();
-    const path = `points/${id}/${date}.jpg`;
-
-    await this.uploadPhotoAsync(localUri, path);
-
     const {name, description} = point;
+    this.loading = true;
+    try {
+      const paths = localUri.map((_, index) =>
+        this.getPathImage(id, date, index),
+      );
 
-    firestore()
-      .collection(POINTS)
-      .add({
-        id,
-        description,
-        name,
-        ...this.currentPositionNewPoint,
-        photos: [path],
-      })
-      .then((ref) => {
-        console.warn('then', JSON.stringify(ref));
-      })
-      .catch((error) => {
-        console.warn('error in AddPoints1', error);
-      });
+      for (const uri of localUri) {
+        let index = localUri.indexOf(uri);
+        await this.uploadPhotoAsync(uri, paths[index]);
+      }
+
+      firestore()
+        .collection(POINTS)
+        .add({
+          id,
+          description,
+          name,
+          ...this.currentPositionNewPoint,
+          photos: paths,
+        })
+        .then((ref) => {
+          console.info('Свалка успешно добавленна!', JSON.stringify(ref));
+        })
+        .catch((error) => {
+          console.warn('error in AddPoints1', error);
+        });
+    } finally {
+      this.loading = false;
+      this.showModalAddPoint = false;
+      this.showMarkerAddPoint = false;
+    }
   }
 
   getUuidv4 = () => {
@@ -126,6 +127,10 @@ class StorePoint {
         v = c == 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
+  };
+
+  getPathImage = (id, date, index) => {
+    return `points/${id}/${date}-${index}.jpg`;
   };
 
   uploadPhotoAsync = async (uri, path) => {

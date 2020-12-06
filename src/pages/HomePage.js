@@ -5,7 +5,6 @@ import {
   View,
   Text,
   StatusBar,
-  Image,
   Button,
   Modal,
 } from 'react-native';
@@ -24,13 +23,13 @@ const coordinateTsk = {
 
 const HomePage = ({storePoint}) => {
   const {
+    loading,
     showModalAddPoint,
     showMarkerAddPoint,
     currentPosition,
     setShowModalAddPoint,
     setShowMarkerAddPoint,
     setCoordinateNewPoint,
-    coordinateNewPoint,
     getPermissionLocale,
   } = storePoint;
 

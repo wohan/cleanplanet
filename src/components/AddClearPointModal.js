@@ -32,9 +32,7 @@ const options = {
 const AddClearPointModal = ({storePoint}) => {
   const {
     setShowModalAddPoint,
-    addPoint,
     uploadPoints,
-    upoloadPhoto2,
   } = storePoint;
 
   let [point, setPoint] = React.useState(pointEmpty);
@@ -121,7 +119,7 @@ const AddClearPointModal = ({storePoint}) => {
         <View style={{justifyItems: 'center'}}>
           <TouchableHighlight
             style={styles.modalButtonAdd}
-            onPress={() => uploadPoints(point, uriPhotos[0])}>
+            onPress={() => uploadPoints(point, uriPhotos)}>
             <Text style={{fontSize: 17}}>Добавить точку</Text>
           </TouchableHighlight>
         </View>
