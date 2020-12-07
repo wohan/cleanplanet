@@ -2,6 +2,7 @@ import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
+  ScrollView,
   View,
   Text,
   StatusBar,
@@ -44,7 +45,7 @@ const HomePage = ({storePoint}) => {
         draggable
         coordinate={coordinateTsk}
         onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
-        title="Точка очистки">
+        title="Укажите свалку">
         <Callout>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
             <Button
@@ -53,7 +54,7 @@ const HomePage = ({storePoint}) => {
             />
             <Button
               onPress={() => setShowModalAddPoint(true)}
-              title="Добавить описание"
+              title="Добавить свалку"
             />
           </View>
         </Callout>
@@ -109,7 +110,9 @@ const HomePage = ({storePoint}) => {
               textStyle={styles.spinnerTextStyle}
               indicatorStyle={styles.spinnerTextStyle}
             />
-            <AddClearPointModal />
+            <ScrollView centerContent={true}>
+              <AddClearPointModal />
+            </ScrollView>
           </Modal>
         </View>
       </SafeAreaView>

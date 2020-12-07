@@ -116,7 +116,10 @@ class StorePoint {
           console.info('Свалка успешно добавленна!', JSON.stringify(ref));
         })
         .catch((error) => {
-          console.warn('error in AddPoints1', error);
+          console.warn(
+            'error in AddPoints1',
+            JSON.stringify(this.stringifyObject(error)),
+          );
           console.warn('error in AddPoints2', JSON.stringify(error));
         });
     } catch (e) {
@@ -127,6 +130,23 @@ class StorePoint {
       this.showMarkerAddPoint = false;
     }
   }
+
+  stringifyObject = (obj) => {
+    if (!obj || typeof obj !== 'object') {
+      return obj.toString();
+    }
+
+    var seen = [];
+    return JSON.stringify(obj, function (key, val) {
+      if (val != null && typeof val === 'object') {
+        if (seen.indexOf(val) >= 0) {
+          return;
+        }
+        seen.push(val);
+      }
+      return val;
+    });
+  };
 
   getUuidv4 = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (

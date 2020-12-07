@@ -5,6 +5,10 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "iosSE": "react-native run-ios --simulator=\"iPhone SE\"",
+    "ios8": "react-native run-ios --simulator=\"iPhone 8\"",
+    "iosMax": "react-native run-ios --simulator=\"iPhone 12 Pro Max\"",
+    "ios11": "react-native run-ios --simulator=\"iPhone 11\"",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
