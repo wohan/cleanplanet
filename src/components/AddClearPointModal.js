@@ -13,10 +13,6 @@ import ImagePicker from 'react-native-image-picker';
 import {DismissKeyboardView} from './DismissKeyboardHOC';
 
 const pointEmpty = {
-  coords: {
-    latitude: 56.483729,
-    longitude: 84.984568,
-  },
   name: '',
   description: '',
   photo: '',
@@ -87,7 +83,7 @@ const AddClearPointModal = ({storePoint}) => {
               onChangeText={(value) => updatePoint('description', value)}
             />
           </View>
-          <View style={{marginTop: 20}}>
+          <View style={{marginTop: 20, marginHorizontal: 10}}>
             <Text style={{fontSize: 20}}>Сфотографируйте мусор</Text>
             <View style={styles.modalViewAddPhoto}>
               <TouchableHighlight
@@ -101,7 +97,6 @@ const AddClearPointModal = ({storePoint}) => {
                   marginTop: 15,
                   right: 0,
                   fontSize: 16,
-                  marginLeft: 10,
                 }}>{`Добавленно ${uriPhotos.length} фото`}</Text>
             </View>
             <View style={styles.itemHorizontal}>
@@ -118,7 +113,9 @@ const AddClearPointModal = ({storePoint}) => {
             <TouchableHighlight
               style={styles.modalButtonAdd}
               onPress={() => uploadPoints(point, uriPhotos)}>
-              <Text style={{fontSize: 17}}>Добавить свалку</Text>
+              <Text style={{fontSize: 17, textAlign: 'center'}}>
+                Добавить свалку
+              </Text>
             </TouchableHighlight>
           </View>
         </View>
@@ -165,7 +162,7 @@ const styles = StyleSheet.create({
   modalButtonAddPhoto: {
     //paddingHorizontal: 10,
     marginTop: 10,
-    marginRight: 15,
+    marginRight: 5,
     padding: 5,
     backgroundColor: '#AFEEEE',
     borderWidth: 1,
@@ -174,8 +171,8 @@ const styles = StyleSheet.create({
   },
   modalViewAddPhoto: {
     flexDirection: 'row',
-    // alignContent: 'center',
     justifyContent: 'space-between',
+    alignContent: 'space-between',
   },
   modalButtonAdd: {
     paddingHorizontal: 5,
@@ -185,7 +182,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     borderColor: Colors.black,
-    width: 150,
+    width: 200,
   },
   scrollView: {
     backgroundColor: Colors.lighter,

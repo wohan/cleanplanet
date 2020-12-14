@@ -113,17 +113,17 @@ class StorePoint {
           photos: paths,
         })
         .then((ref) => {
-          console.info('Свалка успешно добавленна!', JSON.stringify(ref));
+          // console.info('Свалка успешно добавленна!', JSON.stringify(ref));
         })
         .catch((error) => {
-          console.warn(
-            'error in AddPoints1',
-            JSON.stringify(this.stringifyObject(error)),
-          );
-          console.warn('error in AddPoints2', JSON.stringify(error));
+          // console.warn(
+          //   'error in AddPoints1',
+          //   JSON.stringify(this.stringifyObject(error)),
+          // );
+          // console.warn('error in AddPoints2', JSON.stringify(error));
         });
     } catch (e) {
-      console.warn('error in AddPoints1 catch', e);
+      // console.warn('error in AddPoints1 catch', e);
     } finally {
       this.loading = false;
       this.showModalAddPoint = false;
