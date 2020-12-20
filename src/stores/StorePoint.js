@@ -81,8 +81,13 @@ class StorePoint {
       }
     } else {
       const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      const responseCamera = await request(PERMISSIONS.ANDROID.CAMERA);
+      // const responsePhotoLibrary = await request(PERMISSIONS.ANDROID.PICK_FROM_GALLERY);
       if (response === 'granted') {
         this.getCurrentPosition();
+      }
+      if (responseCamera !== 'granted') {
+        console.warn('Доступ к камере не предоставлен!');
       }
     }
   }
@@ -170,6 +175,19 @@ class StorePoint {
       console.warn('Ошибка при загрузке фото');
     }
   };
+
+//  navigator.geolocation.getCurrentPosition(
+//           (location) => {
+//             console.log('location ', location);
+//             if (this.validLocation(location.coords)) {
+//               this.locationToAddress(location.coords);
+//             }
+//           },
+//           (error) => {
+//             console.log('request location error', error);
+//           },
+//           Platform.OS === 'android' ? {} : { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000  }
+//         );
 }
 
 export default new StorePoint();
