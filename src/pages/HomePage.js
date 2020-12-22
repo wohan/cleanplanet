@@ -8,11 +8,12 @@ import {
   StatusBar,
   Button,
   Modal,
+  Platform,
 } from 'react-native';
 
 import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import MapView, {Marker, Callout} from 'react-native-maps';
+import MapView, {Marker, Callout, PROVIDER_GOOGLE} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
 import Spinner from 'react-native-loading-spinner-overlay';
 
@@ -49,11 +50,17 @@ const HomePage = ({storePoint}) => {
         <Callout>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
             <Button
-              onPress={() => setShowMarkerAddPoint(false)}
-              title="Отмена"
+              onPress={() => {
+                console.warn(' work onPress -');
+                setShowMarkerAddPoint(false);
+              }}
+              title="Отмена1"
             />
             <Button
-              onPress={() => setShowModalAddPoint(true)}
+              onPress={() => {
+                console.warn(' work onPress +');
+                setShowModalAddPoint(true);
+              }}
               title="Добавить свалку"
             />
           </View>
@@ -97,7 +104,11 @@ const HomePage = ({storePoint}) => {
               </Text>
             </View>
           )}
-          <MapView style={{height: '100%'}} region={coordinateTsk}>
+          <MapView
+            // mapType={Platform.OS === 'android' ? 'none' : 'standard'}
+            style={{height: '100%'}}
+            region={coordinateTsk}
+            provider={PROVIDER_GOOGLE}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
           </MapView>
           <Modal

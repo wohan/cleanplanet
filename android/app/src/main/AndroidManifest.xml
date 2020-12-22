@@ -25,10 +25,14 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
       <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyA_YLoq-Xg6HoNqfx-RXWlHWLWK1nDIU50"
       />
+
+        <!-- You will also only need to add this uses-library tag -->
+      <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
     </application>
 

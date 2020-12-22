@@ -1,6 +1,7 @@
 import {Platform} from 'react-native';
 import {observable, action} from 'mobx';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
@@ -21,7 +22,9 @@ const POINTS = 'points';
 
 class StorePoint {
   constructor() {
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
   }
 
   @observable currentPosition = {...coordinateTsk};
@@ -56,12 +59,19 @@ class StorePoint {
 
   @action.bound
   getCurrentPosition() {
-    Geolocation.getCurrentPosition((info) => {
-      this.setCoordinateNewPoint({
-        latitude: info.coords.latitude,
-        longitude: info.coords.longitude,
-      });
-    });
+    Geolocation.getCurrentPosition(
+      (info) => {
+        console.warn('info ', info);
+        this.setCoordinateNewPoint({
+          latitude: info.coords.latitude,
+          longitude: info.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn(error.code, error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
   }
 
   @action.bound
@@ -80,10 +90,12 @@ class StorePoint {
         console.warn('Доступ к библиотеке не предоставлен!');
       }
     } else {
+      console.warn("job getPermissionLocale");
       const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       const responseCamera = await request(PERMISSIONS.ANDROID.CAMERA);
       // const responsePhotoLibrary = await request(PERMISSIONS.ANDROID.PICK_FROM_GALLERY);
       if (response === 'granted') {
+        console.warn("job getPermissionLocale granted ");
         this.getCurrentPosition();
       }
       if (responseCamera !== 'granted') {
@@ -176,18 +188,18 @@ class StorePoint {
     }
   };
 
-//  navigator.geolocation.getCurrentPosition(
-//           (location) => {
-//             console.log('location ', location);
-//             if (this.validLocation(location.coords)) {
-//               this.locationToAddress(location.coords);
-//             }
-//           },
-//           (error) => {
-//             console.log('request location error', error);
-//           },
-//           Platform.OS === 'android' ? {} : { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000  }
-//         );
+  //  navigator.geolocation.getCurrentPosition(
+  //           (location) => {
+  //             console.log('location ', location);
+  //             if (this.validLocation(location.coords)) {
+  //               this.locationToAddress(location.coords);
+  //             }
+  //           },
+  //           (error) => {
+  //             console.log('request location error', error);
+  //           },
+  //           Platform.OS === 'android' ? {} : { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000  }
+  //         );
 }
 
 export default new StorePoint();
