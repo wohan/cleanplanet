@@ -47,23 +47,8 @@ const HomePage = ({storePoint}) => {
         coordinate={coordinateTsk}
         onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
         title="Укажите свалку">
-        <Callout>
-          <View style={{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Button
-              onPress={() => {
-                console.warn(' work onPress -');
-                setShowMarkerAddPoint(false);
-              }}
-              title="Отмена1"
-            />
-            <Button
-              onPress={() => {
-                console.warn(' work onPress +');
-                setShowModalAddPoint(true);
-              }}
-              title="Добавить свалку"
-            />
-          </View>
+        <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
+          <Text>Перенесите на местоположение свалки</Text>
         </Callout>
       </Marker>
     );
@@ -92,26 +77,49 @@ const HomePage = ({storePoint}) => {
             />
           </View>
           {showMarkerAddPoint && (
-            <View
-              style={{
-                alignItems: 'center',
-                borderRadius: 10,
-                backgroundColor: '#78e6ff',
-              }}>
-              <Text style={{margin: 10, fontWeight: '400', fontSize: 17}}>
-                Перенесите указатель на место на карте где находится точка
-                очистки и добавьте описание.
-              </Text>
+            <View>
+              <View
+                style={{
+                  alignItems: 'center',
+                  backgroundColor: '#78e6ff',
+                }}>
+                <Text style={{margin: 10, fontWeight: '400', fontSize: 17}}>
+                  Перенесите указатель на место на карте где находится точка
+                  очистки и добавьте описание.
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  backgroundColor: '#78e6ff',
+                  borderBottomLeftRadius: 15,
+                  borderBottomRightRadius: 15,
+                }}>
+                <Button
+                  onPress={() => {
+                    setShowMarkerAddPoint(false);
+                  }}
+                  title="Отмена"
+                />
+                <Button
+                  style={{paddingRight: 5}}
+                  onPress={() => {
+                    setShowModalAddPoint(true);
+                  }}
+                  title="Добавить свалку"
+                />
+              </View>
             </View>
           )}
           <MapView
-            // mapType={Platform.OS === 'android' ? 'none' : 'standard'}
             style={{height: '100%'}}
             region={coordinateTsk}
             provider={PROVIDER_GOOGLE}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
           </MapView>
           <Modal
+            style={{alignContent: 'center'}}
             animationType="slide"
             transparent={true}
             visible={showModalAddPoint}>
@@ -121,7 +129,12 @@ const HomePage = ({storePoint}) => {
               textStyle={styles.spinnerTextStyle}
               indicatorStyle={styles.spinnerTextStyle}
             />
-            <ScrollView centerContent={true}>
+            <ScrollView
+              contentContainerStyle={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
               <AddClearPointModal />
             </ScrollView>
           </Modal>

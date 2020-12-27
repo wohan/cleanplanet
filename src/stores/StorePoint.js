@@ -90,12 +90,12 @@ class StorePoint {
         console.warn('Доступ к библиотеке не предоставлен!');
       }
     } else {
-      console.warn("job getPermissionLocale");
+      console.warn('job getPermissionLocale');
       const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       const responseCamera = await request(PERMISSIONS.ANDROID.CAMERA);
       // const responsePhotoLibrary = await request(PERMISSIONS.ANDROID.PICK_FROM_GALLERY);
       if (response === 'granted') {
-        console.warn("job getPermissionLocale granted ");
+        console.warn('job getPermissionLocale granted ');
         this.getCurrentPosition();
       }
       if (responseCamera !== 'granted') {
@@ -105,29 +105,30 @@ class StorePoint {
   }
 
   @action.bound
-  async uploadPoints(point, localUri) {
+  async uploadPoints(point, uriPhotos) {
     const date = Date.now();
     const id = this.getUuidv4();
     const {name, description} = point;
     this.loading = true;
     try {
-      const paths = localUri.map((_, index) =>
+      const photos = uriPhotos.map((_, index) =>
         this.getPathImage(id, date, index),
       );
 
-      for (const uri of localUri) {
-        let index = localUri.indexOf(uri);
-        await this.uploadPhotoAsync(uri, paths[index]);
+      for (const uri of uriPhotos) {
+        let index = uriPhotos.indexOf(uri);
+        await this.uploadPhoto(uri, photos[index]);
       }
 
       await firestore()
         .collection(POINTS)
         .add({
           id,
-          description,
           name,
+          description,
           ...this.currentPositionNewPoint,
-          photos: paths,
+          photos,
+          date,
         })
         .then((ref) => {
           // console.info('Свалка успешно добавленна!', JSON.stringify(ref));
@@ -140,13 +141,24 @@ class StorePoint {
           // console.warn('error in AddPoints2', JSON.stringify(error));
         });
     } catch (e) {
-      // console.warn('error in AddPoints1 catch', e);
+      this.loading = false;
     } finally {
       this.loading = false;
       this.showModalAddPoint = false;
       this.showMarkerAddPoint = false;
     }
   }
+
+  uploadPhoto = async (uri, path) => {
+    if (uri && path) {
+      const reference = storage().ref(path);
+      try {
+        await reference.putFile(uri);
+      } catch (e) {
+        this.loading = false;
+      }
+    }
+  };
 
   stringifyObject = (obj) => {
     if (!obj || typeof obj !== 'object') {
@@ -177,15 +189,6 @@ class StorePoint {
 
   getPathImage = (id, date, index) => {
     return `points/${id}/${date}-${index}.jpg`;
-  };
-
-  uploadPhotoAsync = async (uri, path) => {
-    const reference = storage().ref(path);
-    try {
-      await reference.putFile(uri);
-    } catch (e) {
-      console.warn('Ошибка при загрузке фото');
-    }
   };
 
   //  navigator.geolocation.getCurrentPosition(
