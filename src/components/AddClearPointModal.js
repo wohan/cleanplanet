@@ -30,18 +30,35 @@ const AddClearPointModal = ({storePoint}) => {
   const {setShowModalAddPoint, uploadPoints} = storePoint;
 
   let [point, setPoint] = React.useState(pointEmpty);
+  let [showEmptyName, setShowEmptyName] = React.useState(false);
+  let [showEmptyImages, setShowEmptyImages] = React.useState(false);
   let [uriPhotos, setUriPhotos] = React.useState([]);
 
   const updatePoint = (field, value) => {
     setPoint({...point, [field]: value});
+    if (field === 'name' && value) {
+      setShowEmptyName(false);
+    } else {
+      setShowEmptyName(true);
+    }
   };
 
   const addPhotos = () => {
     ImagePicker.showImagePicker(options, (response) => {
-      if (!response.cancelled) {
+      if (!response.cancelled && response.uri) {
+        setShowEmptyImages(false);
         setUriPhotos([...uriPhotos, response.uri]);
       }
     });
+  };
+
+  const addPoint = () => {
+    if (point.name && uriPhotos.length > 0) {
+      uploadPoints(point, uriPhotos);
+    } else {
+      !point.name && setShowEmptyName(true);
+      !uriPhotos.length > 0 && setShowEmptyImages(true);
+    }
   };
 
   return (
@@ -61,20 +78,21 @@ const AddClearPointModal = ({storePoint}) => {
             Новая свалка
           </Text>
           <View style={styles.modalItemInput}>
-            <Text style={styles.modalItemInputText}>
-              Введите название
-            </Text>
+            <Text style={styles.modalItemInputText}>Введите название</Text>
             <TextInput
               style={styles.modalItemInputTextInput}
               maxLength={50}
               value={point.name}
               onChangeText={(value) => updatePoint('name', value)}
             />
+            {showEmptyName && (
+              <Text style={{fontSize: 15, color: 'red'}}>
+                Введите название!
+              </Text>
+            )}
           </View>
           <View style={styles.modalItemInput}>
-            <Text style={styles.modalItemInputText}>
-              Введите описание
-            </Text>
+            <Text style={styles.modalItemInputText}>Введите описание</Text>
             <TextInput
               maxLength={300}
               style={styles.modalItemInputTextInput}
@@ -99,6 +117,11 @@ const AddClearPointModal = ({storePoint}) => {
                   fontSize: 16,
                 }}>{`Добавленно ${uriPhotos.length} фото`}</Text>
             </View>
+            {showEmptyImages && (
+              <Text style={{fontSize: 15, color: 'red'}}>
+                Добавьте фотографии, минимум одну!
+              </Text>
+            )}
             <View style={styles.itemHorizontal}>
               {uriPhotos.map((uriPhoto) => (
                 <Image
@@ -112,7 +135,7 @@ const AddClearPointModal = ({storePoint}) => {
           <View style={{justifyItems: 'center'}}>
             <TouchableHighlight
               style={styles.modalButtonAdd}
-              onPress={() => uploadPoints(point, uriPhotos)}>
+              onPress={() => addPoint()}>
               <Text style={{fontSize: 17, textAlign: 'center'}}>
                 Добавить свалку
               </Text>
