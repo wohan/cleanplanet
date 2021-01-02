@@ -15,7 +15,6 @@ import {DismissKeyboardView} from './DismissKeyboardHOC';
 const pointEmpty = {
   name: '',
   description: '',
-  photo: '',
 };
 
 const options = {
@@ -36,10 +35,12 @@ const AddClearPointModal = ({storePoint}) => {
 
   const updatePoint = (field, value) => {
     setPoint({...point, [field]: value});
-    if (field === 'name' && value) {
-      setShowEmptyName(false);
-    } else {
-      setShowEmptyName(true);
+    if (field === 'name') {
+      if (value) {
+        setShowEmptyName(false);
+      } else {
+        setShowEmptyName(true);
+      }
     }
   };
 

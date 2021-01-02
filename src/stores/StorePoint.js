@@ -1,6 +1,5 @@
 import {Platform} from 'react-native';
 import {observable, action} from 'mobx';
-// import Geolocation from '@react-native-community/geolocation';
 import Geolocation from 'react-native-geolocation-service';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import storage from '@react-native-firebase/storage';
@@ -28,7 +27,12 @@ class StorePoint {
   }
 
   @observable currentPosition = {...coordinateTsk};
-  @observable currentPositionNewPoint = {latitude: null, longitude: null};
+  @observable currentPositionNewPoint = {
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  };
   @observable showModalAddPoint = false;
   @observable showMarkerAddPoint = false;
   @observable points = [];
@@ -57,12 +61,13 @@ class StorePoint {
     this.showMarkerAddPoint = false;
   }
 
+  //TODO метод перенесен в HomePoint
   @action.bound
   getCurrentPosition() {
     Geolocation.getCurrentPosition(
       (info) => {
-        console.warn('info ', info);
         this.setCoordinateNewPoint({
+          ...this.currentPositionNewPoint,
           latitude: info.coords.latitude,
           longitude: info.coords.longitude,
         });
@@ -74,6 +79,7 @@ class StorePoint {
     );
   }
 
+  //TODO метод перенесен в HomePoint
   @action.bound
   async getPermissionLocale() {
     if (Platform.OS === 'ios') {

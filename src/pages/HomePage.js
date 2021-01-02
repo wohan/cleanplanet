@@ -16,10 +16,17 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import MapView, {Marker, Callout, PROVIDER_GOOGLE} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
 import Spinner from 'react-native-loading-spinner-overlay';
+import Geolocation from 'react-native-geolocation-service';
+import {PERMISSIONS, request} from 'react-native-permissions';
 
 const coordinateTsk = {
   latitude: 56.483729,
   longitude: 84.984568,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
+};
+
+const delta = {
   latitudeDelta: 0.05,
   longitudeDelta: 0.05,
 };
@@ -29,22 +36,70 @@ const HomePage = ({storePoint}) => {
     loading,
     showModalAddPoint,
     showMarkerAddPoint,
-    currentPosition,
     setShowModalAddPoint,
     setShowMarkerAddPoint,
     setCoordinateNewPoint,
-    getPermissionLocale,
   } = storePoint;
+
+  let [coordinatePoint, setCoordinatePoint] = React.useState({
+    latitude: 0,
+    longitude: 0,
+    ...delta,
+  });
+
+  const getCurrentPosition = async () => {
+    Geolocation.getCurrentPosition(
+      (info) => {
+        setCoordinatePoint({
+          ...coordinatePoint,
+          latitude: info.coords.latitude,
+          longitude: info.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn(error.code, error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  };
+
+  const getPermissionLocale = async () => {
+    if (Platform.OS === 'ios') {
+      const response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      const responseCamera = await request(PERMISSIONS.IOS.CAMERA);
+      const responsePhotoLibrary = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+      if (response === 'granted') {
+        getCurrentPosition();
+      }
+      if (responseCamera !== 'granted') {
+        console.warn('Доступ к камере не предоставлен!');
+      }
+      if (responsePhotoLibrary !== 'granted') {
+        console.warn('Доступ к библиотеке не предоставлен!');
+      }
+    } else {
+      console.warn('job getPermissionLocale');
+      const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      const responseCamera = await request(PERMISSIONS.ANDROID.CAMERA);
+      // const responsePhotoLibrary = await request(PERMISSIONS.ANDROID.PICK_FROM_GALLERY);
+      if (response === 'granted') {
+        getCurrentPosition();
+      }
+      if (responseCamera !== 'granted') {
+        console.warn('Доступ к камере не предоставлен!');
+      }
+    }
+  };
 
   React.useEffect(() => {
     getPermissionLocale();
-  }, [currentPosition, showModalAddPoint]);
+  }, []);
 
   const createMarkerAddNewPoint = () => {
     return (
       <Marker
         draggable
-        coordinate={coordinateTsk}
+        coordinate={coordinatePoint}
         onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
         title="Укажите свалку">
         <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
@@ -114,7 +169,7 @@ const HomePage = ({storePoint}) => {
           )}
           <MapView
             style={{height: '100%'}}
-            region={coordinateTsk}
+            region={coordinatePoint}
             provider={PROVIDER_GOOGLE}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
           </MapView>
