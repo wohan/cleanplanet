@@ -196,19 +196,6 @@ class StorePoint {
   getPathImage = (id, date, index) => {
     return `points/${id}/${date}-${index}.jpg`;
   };
-
-  //  navigator.geolocation.getCurrentPosition(
-  //           (location) => {
-  //             console.log('location ', location);
-  //             if (this.validLocation(location.coords)) {
-  //               this.locationToAddress(location.coords);
-  //             }
-  //           },
-  //           (error) => {
-  //             console.log('request location error', error);
-  //           },
-  //           Platform.OS === 'android' ? {} : { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000  }
-  //         );
 }
 
 export default new StorePoint();

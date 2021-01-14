@@ -13,7 +13,7 @@ import {
 
 import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import MapView, {Marker, Callout, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Geolocation from 'react-native-geolocation-service';
@@ -169,8 +169,7 @@ const HomePage = ({storePoint}) => {
           )}
           <MapView
             style={{height: '100%'}}
-            region={coordinatePoint}
-            provider={PROVIDER_GOOGLE}>
+            region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
           </MapView>
           <Modal
