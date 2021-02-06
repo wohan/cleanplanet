@@ -15,9 +15,11 @@ import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
+import {autorun} from 'mobx';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
+import { Observer } from 'mobx-react/native';
 
 const coordinateTsk = {
   latitude: 56.483729,
@@ -34,11 +36,14 @@ const delta = {
 const HomePage = ({storePoint}) => {
   const {
     loading,
+    points,
     showModalAddPoint,
     showMarkerAddPoint,
     setShowModalAddPoint,
     setShowMarkerAddPoint,
     setCoordinateNewPoint,
+    loadPoints,
+    showPoints,
   } = storePoint;
 
   let [coordinatePoint, setCoordinatePoint] = React.useState({
@@ -72,13 +77,13 @@ const HomePage = ({storePoint}) => {
         getCurrentPosition();
       }
       if (responseCamera !== 'granted') {
-        console.warn('Доступ к камере не предоставлен!');
+        console.log('Доступ к камере не предоставлен!');
       }
       if (responsePhotoLibrary !== 'granted') {
-        console.warn('Доступ к библиотеке не предоставлен!');
+        console.log('Доступ к библиотеке не предоставлен!');
       }
     } else {
-      console.warn('job getPermissionLocale');
+      console.log('job getPermissionLocale');
       const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       const responseCamera = await request(PERMISSIONS.ANDROID.CAMERA);
       // const responsePhotoLibrary = await request(PERMISSIONS.ANDROID.PICK_FROM_GALLERY);
@@ -86,13 +91,14 @@ const HomePage = ({storePoint}) => {
         getCurrentPosition();
       }
       if (responseCamera !== 'granted') {
-        console.warn('Доступ к камере не предоставлен!');
+        console.log('Доступ к камере не предоставлен!');
       }
     }
   };
 
   React.useEffect(() => {
     getPermissionLocale();
+    loadPoints();
   }, []);
 
   const createMarkerAddNewPoint = () => {
@@ -109,8 +115,24 @@ const HomePage = ({storePoint}) => {
     );
   };
 
+  const createMarkerPoint = (point) => {
+    return (
+      <Marker
+        draggable
+        coordinate={{
+          latitude: point.latitude,
+          longitude: point.longitude,
+        }}
+        title={point.name}>
+        <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
+          <Text>{point.description}</Text>
+        </Callout>
+      </Marker>
+    );
+  };
+
   return (
-    <>
+    <Observer>
       <StatusBar />
       <SafeAreaView>
         <View>
@@ -148,8 +170,6 @@ const HomePage = ({storePoint}) => {
                   flexDirection: 'row',
                   justifyContent: 'space-around',
                   backgroundColor: '#78e6ff',
-                  borderBottomLeftRadius: 15,
-                  borderBottomRightRadius: 15,
                 }}>
                 <Button
                   onPress={() => {
@@ -167,10 +187,15 @@ const HomePage = ({storePoint}) => {
               </View>
             </View>
           )}
-          <MapView
-            style={{height: '100%'}}
-            region={coordinatePoint}>
+          <MapView style={{height: '100%'}} region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
+            {/*{points.slice().length > 0 && points.slice().map((point) => createMarkerPoint(point))}*/}
+            {/*{autorun(() => {*/}
+            {/*  points.map((point) => createMarkerPoint(point));*/}
+            {/*})}*/}
+            {/*{showPoints && console.log("from MAPPPPPP ", JSON.stringify(points.slice().length))*/}
+            {/*  //points.splice().map((point) => createMarkerPoint(point[0]))*/}
+            {/*}*/}
           </MapView>
           <Modal
             style={{alignContent: 'center'}}
@@ -194,7 +219,7 @@ const HomePage = ({storePoint}) => {
           </Modal>
         </View>
       </SafeAreaView>
-    </>
+    </Observer>
   );
 };
 

@@ -35,9 +35,10 @@ class StorePoint {
   };
   @observable showModalAddPoint = false;
   @observable showMarkerAddPoint = false;
-  @observable points = [];
-  @observable pointsToAdd = [];
+  @observable points = observable([]);
+  @observable pointsToAdd = observable([]);
   @observable loading = false;
+  @observable showPoints = false;
 
   @action.bound
   setCoordinateNewPoint(coordinate) {
@@ -165,6 +166,24 @@ class StorePoint {
       }
     }
   };
+
+  @action.bound
+  loadPoints() {
+    firestore()
+      .collection(POINTS)
+      .get()
+      .then(response => {
+        console.log('Total points: ', response.size);
+        this.points = response;
+        response.forEach(documentSnapshot => {
+          console.log('User ID: ', documentSnapshot.id, documentSnapshot.data());
+        });
+      })
+      .finally(() => {
+        this.showPoints = true;
+        }
+      );
+  }
 
   stringifyObject = (obj) => {
     if (!obj || typeof obj !== 'object') {
