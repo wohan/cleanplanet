@@ -36,6 +36,7 @@ class StorePoint {
   @observable showModalAddPoint = false;
   @observable showMarkerAddPoint = false;
   @observable points = observable([]);
+  @observable pointsO = {arr: []};
   @observable pointsToAdd = observable([]);
   @observable loading = false;
   @observable showPoints = false;
@@ -172,17 +173,21 @@ class StorePoint {
     firestore()
       .collection(POINTS)
       .get()
-      .then(response => {
+      .then((response) => {
         console.log('Total points: ', response.size);
         this.points = response;
-        response.forEach(documentSnapshot => {
-          console.log('User ID: ', documentSnapshot.id, documentSnapshot.data());
+        this.pointsO.arr = response;
+        response.forEach((documentSnapshot) => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
         });
       })
       .finally(() => {
         this.showPoints = true;
-        }
-      );
+      });
   }
 
   stringifyObject = (obj) => {
@@ -214,6 +219,10 @@ class StorePoint {
 
   getPathImage = (id, date, index) => {
     return `points/${id}/${date}-${index}.jpg`;
+  };
+
+  getLinkImage = async (path) => {
+    return storage().ref(path).getDownloadURL();
   };
 }
 

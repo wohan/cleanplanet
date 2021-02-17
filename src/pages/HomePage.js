@@ -9,7 +9,8 @@ import {
   Button,
   Modal,
   Platform,
-} from 'react-native';
+  Image, TouchableHighlight,
+} from "react-native";
 
 import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -19,7 +20,8 @@ import {autorun} from 'mobx';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
-import { Observer } from 'mobx-react/native';
+import firestore from '@react-native-firebase/firestore';
+//import { Observer } from 'mobx-react/native';
 
 const coordinateTsk = {
   latitude: 56.483729,
@@ -33,17 +35,69 @@ const delta = {
   longitudeDelta: 0.05,
 };
 
+const POINTS = 'points';
+
+const CreateMarkerPoint = ({point, storePoint}) => {
+  let [linkPhoto, setLinkPhoto] = React.useState(null);
+  const {data, id} = point;
+
+  React.useEffect(() => {
+    storePoint.getLinkImage(data.photos[0]).then((linkImage) => {
+      console.log("linkImage ", linkImage);
+      setLinkPhoto(linkImage);
+    });
+  }, []);
+
+  return (
+    <Marker
+      draggable
+      coordinate={{
+        latitude: data.latitude,
+        longitude: data.longitude,
+      }}
+      title={data.name}>
+      <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
+        <Text style={{fontSize: 15, fontWeight: '600'}}>Точка очистки</Text>
+        <Text style={{fontSize: 15, fontWeight: '600', paddingTop: 5}}>
+          Наименование:{' '}
+        </Text>
+        <Text style={{paddingBottom: 5}}>{data.name}</Text>
+        {linkPhoto ? (
+          <Image
+            key={data.photos}
+            source={{uri: linkPhoto}}
+            style={{width: 100, height: 100}}
+          />
+        ) : (
+          <Text>Фото отсутствует!</Text>
+        )}
+        <Text style={{paddingTop: 5, fontSize: 15, fontWeight: '600'}}>
+          Описание:{' '}
+        </Text>
+        <Text>{data.description}</Text>
+        <View style={{justifyItems: 'center'}}>
+          <TouchableHighlight
+            style={styles.modalButtonAdd}
+            onPress={() => console.log()}>
+            <Text style={{fontSize: 17, textAlign: 'center'}}>
+              Подробнее
+            </Text>
+          </TouchableHighlight>
+        </View>
+      </Callout>
+    </Marker>
+  );
+};
+
 const HomePage = ({storePoint}) => {
   const {
     loading,
-    points,
     showModalAddPoint,
     showMarkerAddPoint,
     setShowModalAddPoint,
     setShowMarkerAddPoint,
     setCoordinateNewPoint,
-    loadPoints,
-    showPoints,
+    getLinkImage,
   } = storePoint;
 
   let [coordinatePoint, setCoordinatePoint] = React.useState({
@@ -51,6 +105,9 @@ const HomePage = ({storePoint}) => {
     longitude: 0,
     ...delta,
   });
+
+  let [points, setPoints] = React.useState([]);
+  let [loadingPoints, setLoadingPoints] = React.useState(false);
 
   const getCurrentPosition = async () => {
     Geolocation.getCurrentPosition(
@@ -96,6 +153,24 @@ const HomePage = ({storePoint}) => {
     }
   };
 
+  const loadPoints = async () => {
+    firestore()
+      .collection(POINTS)
+      .get()
+      .then((response) => {
+        let pointsLocal = [];
+        response.forEach((point) => {
+          pointsLocal.push({
+            id: point.id,
+            data: point.data(),
+          });
+        });
+        setPoints(pointsLocal);
+        setLoadingPoints(true);
+      })
+      .finally(() => {});
+  };
+
   React.useEffect(() => {
     getPermissionLocale();
     loadPoints();
@@ -115,24 +190,8 @@ const HomePage = ({storePoint}) => {
     );
   };
 
-  const createMarkerPoint = (point) => {
-    return (
-      <Marker
-        draggable
-        coordinate={{
-          latitude: point.latitude,
-          longitude: point.longitude,
-        }}
-        title={point.name}>
-        <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
-          <Text>{point.description}</Text>
-        </Callout>
-      </Marker>
-    );
-  };
-
   return (
-    <Observer>
+    <>
       <StatusBar />
       <SafeAreaView>
         <View>
@@ -153,6 +212,12 @@ const HomePage = ({storePoint}) => {
               title={'Добавить точку'}
             />
           </View>
+          {/*{loadingPoints && <Spinner*/}
+          {/*  visible={true}*/}
+          {/*  textContent={'Загрузка...'}*/}
+          {/*  textStyle={styles.spinnerTextStyle}*/}
+          {/*  indicatorStyle={styles.spinnerTextStyle}*/}
+          {/*/>}*/}
           {showMarkerAddPoint && (
             <View>
               <View
@@ -189,13 +254,10 @@ const HomePage = ({storePoint}) => {
           )}
           <MapView style={{height: '100%'}} region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
-            {/*{points.slice().length > 0 && points.slice().map((point) => createMarkerPoint(point))}*/}
-            {/*{autorun(() => {*/}
-            {/*  points.map((point) => createMarkerPoint(point));*/}
-            {/*})}*/}
-            {/*{showPoints && console.log("from MAPPPPPP ", JSON.stringify(points.slice().length))*/}
-            {/*  //points.splice().map((point) => createMarkerPoint(point[0]))*/}
-            {/*}*/}
+            {points.length > 0 &&
+              points.map((point) => (
+                <CreateMarkerPoint point={point} storePoint={storePoint} />
+              ))}
           </MapView>
           <Modal
             style={{alignContent: 'center'}}
@@ -219,7 +281,7 @@ const HomePage = ({storePoint}) => {
           </Modal>
         </View>
       </SafeAreaView>
-    </Observer>
+    </>
   );
 };
 
@@ -267,7 +329,7 @@ const styles = StyleSheet.create({
   },
   modalButtonAdd: {
     paddingHorizontal: 10,
-    marginTop: 30,
+    marginTop: 10,
     padding: 5,
     backgroundColor: '#AFEEEE',
     borderWidth: 1,
