@@ -9,26 +9,16 @@ import {
   Button,
   Modal,
   Platform,
-  Image, TouchableHighlight,
-} from "react-native";
-
+  TouchableHighlight,
+} from 'react-native';
 import AddClearPointModal from '../components/AddClearPointModal';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
-import {autorun} from 'mobx';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
-//import { Observer } from 'mobx-react/native';
-
-const coordinateTsk = {
-  latitude: 56.483729,
-  longitude: 84.984568,
-  latitudeDelta: 0.05,
-  longitudeDelta: 0.05,
-};
 
 const delta = {
   latitudeDelta: 0.05,
@@ -37,59 +27,7 @@ const delta = {
 
 const POINTS = 'points';
 
-const CreateMarkerPoint = ({point, storePoint}) => {
-  let [linkPhoto, setLinkPhoto] = React.useState(null);
-  const {data, id} = point;
-
-  React.useEffect(() => {
-    storePoint.getLinkImage(data.photos[0]).then((linkImage) => {
-      console.log("linkImage ", linkImage);
-      setLinkPhoto(linkImage);
-    });
-  }, []);
-
-  return (
-    <Marker
-      draggable
-      coordinate={{
-        latitude: data.latitude,
-        longitude: data.longitude,
-      }}
-      title={data.name}>
-      <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
-        <Text style={{fontSize: 15, fontWeight: '600'}}>Точка очистки</Text>
-        <Text style={{fontSize: 15, fontWeight: '600', paddingTop: 5}}>
-          Наименование:{' '}
-        </Text>
-        <Text style={{paddingBottom: 5}}>{data.name}</Text>
-        {linkPhoto ? (
-          <Image
-            key={data.photos}
-            source={{uri: linkPhoto}}
-            style={{width: 100, height: 100}}
-          />
-        ) : (
-          <Text>Фото отсутствует!</Text>
-        )}
-        <Text style={{paddingTop: 5, fontSize: 15, fontWeight: '600'}}>
-          Описание:{' '}
-        </Text>
-        <Text>{data.description}</Text>
-        <View style={{justifyItems: 'center'}}>
-          <TouchableHighlight
-            style={styles.modalButtonAdd}
-            onPress={() => console.log()}>
-            <Text style={{fontSize: 17, textAlign: 'center'}}>
-              Подробнее
-            </Text>
-          </TouchableHighlight>
-        </View>
-      </Callout>
-    </Marker>
-  );
-};
-
-const HomePage = ({storePoint}) => {
+const HomePage = ({storePoint, navigation}) => {
   const {
     loading,
     showModalAddPoint,
@@ -97,7 +35,6 @@ const HomePage = ({storePoint}) => {
     setShowModalAddPoint,
     setShowMarkerAddPoint,
     setCoordinateNewPoint,
-    getLinkImage,
   } = storePoint;
 
   let [coordinatePoint, setCoordinatePoint] = React.useState({
@@ -107,7 +44,6 @@ const HomePage = ({storePoint}) => {
   });
 
   let [points, setPoints] = React.useState([]);
-  let [loadingPoints, setLoadingPoints] = React.useState(false);
 
   const getCurrentPosition = async () => {
     Geolocation.getCurrentPosition(
@@ -166,9 +102,7 @@ const HomePage = ({storePoint}) => {
           });
         });
         setPoints(pointsLocal);
-        setLoadingPoints(true);
-      })
-      .finally(() => {});
+      });
   };
 
   React.useEffect(() => {
@@ -185,6 +119,39 @@ const HomePage = ({storePoint}) => {
         title="Укажите свалку">
         <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
           <Text>Перенесите на местоположение свалки</Text>
+        </Callout>
+      </Marker>
+    );
+  };
+
+  const createMarkerPoint = (point) => {
+    const {data, id} = point;
+
+    return (
+      <Marker
+        draggable
+        coordinate={{
+          latitude: data.latitude,
+          longitude: data.longitude,
+        }}
+        title={data.name}>
+        <Callout
+          style={{width: 200, flex: 1, position: 'absolute'}}
+          onPress={() => navigation.navigate('Point', {point})}>
+          <View>
+            <Text style={{fontSize: 15, fontWeight: '600'}}>Точка очистки</Text>
+            <Text style={{fontSize: 15, fontWeight: '600', paddingTop: 5}}>
+              Наименование:{' '}
+            </Text>
+            <Text style={{paddingBottom: 5}}>{data.name}</Text>
+            <Text style={{paddingTop: 5, fontSize: 15, fontWeight: '600'}}>
+              Описание:{' '}
+            </Text>
+            <Text>{data.description}</Text>
+          </View>
+          <TouchableHighlight style={styles.modalButtonAdd}>
+            <Text style={{fontSize: 17, textAlign: 'center'}}>Подробнее</Text>
+          </TouchableHighlight>
         </Callout>
       </Marker>
     );
@@ -212,12 +179,6 @@ const HomePage = ({storePoint}) => {
               title={'Добавить точку'}
             />
           </View>
-          {/*{loadingPoints && <Spinner*/}
-          {/*  visible={true}*/}
-          {/*  textContent={'Загрузка...'}*/}
-          {/*  textStyle={styles.spinnerTextStyle}*/}
-          {/*  indicatorStyle={styles.spinnerTextStyle}*/}
-          {/*/>}*/}
           {showMarkerAddPoint && (
             <View>
               <View
@@ -255,9 +216,7 @@ const HomePage = ({storePoint}) => {
           <MapView style={{height: '100%'}} region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
             {points.length > 0 &&
-              points.map((point) => (
-                <CreateMarkerPoint point={point} storePoint={storePoint} />
-              ))}
+              points.map((point) => createMarkerPoint(point))}
           </MapView>
           <Modal
             style={{alignContent: 'center'}}
@@ -328,6 +287,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   modalButtonAdd: {
+    zIndex: 1,
     paddingHorizontal: 10,
     marginTop: 10,
     padding: 5,
@@ -335,7 +295,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     borderColor: Colors.black,
-    width: 150,
+    width: '100%',
   },
   scrollView: {
     backgroundColor: Colors.lighter,
