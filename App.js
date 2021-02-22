@@ -5,6 +5,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import HomePage from './src/pages/HomePage';
 import PointPage from './src/pages/PointPage';
+import {Dimensions} from 'react-native';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
+const {_height, width} = Dimensions.get('window');
+
+EStyleSheet.build({
+  $textColor: '#0275d8',
+  $sliderWidth: '26rem',
+  $itemWidth: '22.2rem',
+  $rem: width > 376 ? (width > 415 ? 17 : 16) : 14,
+});
 
 const stores = {
   storePoint: StorePoint,

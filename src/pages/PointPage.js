@@ -1,181 +1,114 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  Button,
-  Modal,
-  Platform,
-  Image,
-  TouchableHighlight,
-} from 'react-native';
-
-import AddClearPointModal from '../components/AddClearPointModal';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import MapView, {Marker, Callout} from 'react-native-maps';
+import {SafeAreaView, View, Text, StatusBar, Button, Image} from 'react-native';
+import Carousel from 'react-native-snap-carousel';
+import EStyleSheet from 'react-native-extended-stylesheet';
 import {inject, observer} from 'mobx-react';
-import Spinner from 'react-native-loading-spinner-overlay';
-import Geolocation from 'react-native-geolocation-service';
-import {PERMISSIONS, request} from 'react-native-permissions';
-import firestore from '@react-native-firebase/firestore';
+
+const styles = EStyleSheet.create({
+  containerHead: {
+    marginBottom: '0.8rem',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  textHead: {
+    fontSize: '1.5rem',
+    paddingTop: '0.4rem',
+    paddingLeft: '0.8rem',
+    fontWeight: '600',
+    color: '#02cdfa',
+  },
+  buttonBack: {
+    paddingRight: 30,
+  },
+  containerImage: {
+    height: '43.5%',
+  },
+  viewImages: {
+    marginTop: '0.8rem',
+    paddingTop: '0.8rem',
+    flexDirection: 'column',
+    alignItems: 'center',
+    alignContent: 'center',
+  },
+  image: {
+    width: '22rem',
+    height: '22rem',
+    borderRadius: '1rem',
+  },
+  container: {
+    backgroundColor: '#bbeaff',
+    margin: '0.8rem',
+    padding: '0.8rem',
+    borderRadius: '0.8rem',
+    height: '46%',
+  },
+  textNameFields: {
+    fontSize: '1.2rem',
+    fontWeight: '500',
+    paddingTop: 5,
+  },
+  textFields: {
+    fontSize: '1rem',
+    fontWeight: '300',
+    paddingTop: 5,
+  },
+});
 
 const PointPage = ({storePoint, navigation, route}) => {
   let [linksPhoto, setLinksPhoto] = React.useState([]);
-  let [loadLinks, setLoadLinks] = React.useState(false);
-  const {data, id} = route.params.point;
+  const {data, _id} = route.params.point;
 
   React.useEffect(() => {
     if (data.photos.length > 0) {
+      let linksPhotoArray = [];
       data.photos.forEach((link) => {
         storePoint.getLinkImage(link).then((linkImage) => {
-          setLinksPhoto([...linksPhoto, linkImage]);
+          linksPhotoArray.push(linkImage);
+          if (linksPhotoArray.length === data.photos.length) {
+            setLinksPhoto(linksPhotoArray);
+          }
         });
       });
     }
   }, []);
+
+  const renderItem = ({item}) => {
+    return <Image style={styles.image} source={{uri: item}} />;
+  };
 
   return (
     <>
       <StatusBar />
       <SafeAreaView>
         <View>
-          <View>
-            <Text style={{fontSize: 15, fontWeight: '600'}}>Точка очистки</Text>
-            <Text style={{fontSize: 15, fontWeight: '600', paddingTop: 5}}>
-              Наименование:{' '}
-            </Text>
-            <Text style={{paddingBottom: 5}}>{data.name}</Text>
-            {linksPhoto.length === data.photos.length ? (
-              <Image
-                key={data.photos}
-                source={{uri: linksPhoto[0]}}
-                style={{width: 200, height: 200}}
-              />
-            ) : (
-              <Text>Фото отсутствует!</Text>
-            )}
-            <Text style={{paddingTop: 5, fontSize: 15, fontWeight: '600'}}>
-              Описание:{' '}
-            </Text>
-            <Text>{data.description}</Text>
+          <View style={styles.containerHead}>
+            <Text style={styles.textHead}>Чистая Планета</Text>
+            <Button
+              style={styles.buttonBack}
+              onPress={() => navigation.navigate('Home')}
+              title={'Назад к карте'}
+            />
           </View>
-          <TouchableHighlight
-            style={styles.modalButtonAdd}
-            onPressIn={() => navigation.navigate('Home')}>
-            <Text style={{fontSize: 17, textAlign: 'center'}}>Подробнее</Text>
-          </TouchableHighlight>
+          <View style={styles.containerImage}>
+            <Carousel
+              style={styles.viewImages}
+              layout={'default'}
+              data={linksPhoto}
+              renderItem={renderItem}
+              sliderWidth={EStyleSheet.value('$sliderWidth')}
+              itemWidth={EStyleSheet.value('$itemWidth')}
+            />
+          </View>
+          <View style={styles.container}>
+            <Text style={styles.textNameFields}>Наименование: </Text>
+            <Text style={styles.textFields}>{data.name}</Text>
+            <Text style={styles.textNameFields}>Описание: </Text>
+            <Text style={styles.textFields}>{data.description}</Text>
+          </View>
         </View>
       </SafeAreaView>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  modalCenter: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalItemInput: {
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
-  modalItemInputText: {
-    fontSize: 20,
-  },
-  modalItemInputTextInput: {
-    borderColor: '#AFEEEE',
-    borderWidth: 2,
-    borderRadius: 5,
-    marginTop: 10,
-    padding: 5,
-    fontSize: 17,
-  },
-  modalButtonAddPhoto: {
-    paddingHorizontal: 10,
-    marginTop: 10,
-    padding: 5,
-    backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: Colors.black,
-  },
-  modalViewAddPhoto: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'space-between',
-  },
-  modalButtonAdd: {
-    zIndex: 1,
-    paddingHorizontal: 10,
-    marginTop: 10,
-    padding: 5,
-    backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: Colors.black,
-    width: '100%',
-  },
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    height: 800,
-    width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-    height: '100%',
-  },
-  spinnerTextStyle: {
-    color: '#ff0000',
-  },
-});
 
 export default inject('storePoint')(observer(PointPage));
