@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  StyleSheet,
   View,
   Text,
   TextInput,
@@ -11,11 +10,7 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {inject, observer} from 'mobx-react';
 import ImagePicker from 'react-native-image-picker';
 import {DismissKeyboardView} from './DismissKeyboardHOC';
-
-const pointEmpty = {
-  name: '',
-  description: '',
-};
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const options = {
   title: 'Выберите изображение',
@@ -28,7 +23,7 @@ const options = {
 const AddClearPointModal = ({storePoint}) => {
   const {setShowModalAddPoint, uploadPoints} = storePoint;
 
-  let [point, setPoint] = React.useState(pointEmpty);
+  let [point, setPoint] = React.useState({name: '', description: ''});
   let [showEmptyName, setShowEmptyName] = React.useState(false);
   let [showEmptyImages, setShowEmptyImages] = React.useState(false);
   let [uriPhotos, setUriPhotos] = React.useState([]);
@@ -69,15 +64,17 @@ const AddClearPointModal = ({storePoint}) => {
           <TouchableHighlight
             activeOpacity={1}
             underlayColor={'rgb(230, 230, 240)'}
-            style={{right: '-38%', padding: 10, borderRadius: 10}}
+            style={styles.buttonClose}
             onPress={() => setShowModalAddPoint(false)}>
-            <Text style={{fontSize: 17, color: 'rgb(71, 124, 251)'}}>
+            <Text
+              style={{
+                ...styles.modalItemInputText,
+                color: 'rgb(71, 124, 251)',
+              }}>
               закрыть
             </Text>
           </TouchableHighlight>
-          <Text style={(styles.modalItemInputText, {fontSize: 22})}>
-            Новая свалка
-          </Text>
+          <Text style={styles.textHeader}>Новая свалка</Text>
           <View style={styles.modalItemInput}>
             <Text style={styles.modalItemInputText}>Введите название</Text>
             <TextInput
@@ -87,9 +84,7 @@ const AddClearPointModal = ({storePoint}) => {
               onChangeText={(value) => updatePoint('name', value)}
             />
             {showEmptyName && (
-              <Text style={{fontSize: 15, color: 'red'}}>
-                Введите название!
-              </Text>
+              <Text style={styles.textWarning}>Введите название!</Text>
             )}
           </View>
           <View style={styles.modalItemInput}>
@@ -102,24 +97,18 @@ const AddClearPointModal = ({storePoint}) => {
               onChangeText={(value) => updatePoint('description', value)}
             />
           </View>
-          <View style={{marginTop: 20, marginHorizontal: 10}}>
-            <Text style={{fontSize: 20}}>Сфотографируйте мусор</Text>
+          <View style={styles.viewPhoto}>
+            <Text style={styles.modalItemInputText}>Сфотографируйте мусор</Text>
             <View style={styles.modalViewAddPhoto}>
               <TouchableHighlight
                 style={styles.modalButtonAddPhoto}
                 onPress={() => addPhotos()}
                 disabled={uriPhotos.length > 2}>
-                <Text style={{fontSize: 17}}>Добавить фото</Text>
+                <Text style={styles.textButton}>Добавить фото</Text>
               </TouchableHighlight>
-              <Text
-                style={{
-                  marginTop: 15,
-                  right: 0,
-                  fontSize: 16,
-                }}>{`Добавленно ${uriPhotos.length} фото`}</Text>
             </View>
             {showEmptyImages && (
-              <Text style={{fontSize: 15, color: 'red'}}>
+              <Text style={styles.textWarning}>
                 Добавьте фотографии, минимум одну!
               </Text>
             )}
@@ -128,18 +117,16 @@ const AddClearPointModal = ({storePoint}) => {
                 <Image
                   key={uriPhoto}
                   source={{uri: uriPhoto}}
-                  style={{width: 100, height: 100}}
+                  style={styles.image}
                 />
               ))}
             </View>
           </View>
-          <View style={{justifyItems: 'center'}}>
+          <View>
             <TouchableHighlight
               style={styles.modalButtonAdd}
               onPress={() => addPoint()}>
-              <Text style={{fontSize: 17, textAlign: 'center'}}>
-                Добавить свалку
-              </Text>
+              <Text style={styles.textButton}>Добавить свалку</Text>
             </TouchableHighlight>
           </View>
         </View>
@@ -148,7 +135,32 @@ const AddClearPointModal = ({storePoint}) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
+  buttonClose: {
+    right: '-38%',
+    padding: '0.4rem',
+    borderRadius: '0.4rem',
+  },
+  textHeader: {
+    fontSize: '1.5rem',
+  },
+  viewPhoto: {
+    paddingTop: '1.2rem',
+    width: '21rem',
+  },
+  textWarning: {
+    paddingTop: '0.4rem',
+    fontSize: '1.1rem',
+    color: 'red',
+  },
+  image: {
+    width: '7rem',
+    height: '7rem',
+  },
+  textButton: {
+    fontSize: '1.1rem',
+    textAlign: 'center',
+  },
   modalCenter: {
     flex: 1,
     justifyContent: 'center',
@@ -156,41 +168,49 @@ const styles = StyleSheet.create({
   },
   itemHorizontal: {
     flexDirection: 'row',
-    padding: 10,
+    padding: '0.4rem',
   },
   modalView: {
     backgroundColor: 'white',
-    paddingHorizontal: 5,
-    paddingTop: 10,
-    paddingBottom: 20,
-    borderRadius: 10,
+    paddingHorizontal: '0.8rem',
+    paddingTop: '0.4rem',
+    paddingBottom: '1.2rem',
+    borderRadius: '0.4rem',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalItemInput: {
-    paddingHorizontal: 5,
-    paddingTop: 20,
+    paddingHorizontal: '0.2rem',
+    paddingTop: '1.2rem',
   },
   modalItemInputText: {
-    fontSize: 20,
+    fontSize: '1.2rem',
+  },
+  modalItemInputPhoto: {
+    fontSize: '1.2rem',
+    paddingTop: '0.4rem',
+  },
+  containerHead: {
+    marginBottom: '0.8rem',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   modalItemInputTextInput: {
     borderColor: '#AFEEEE',
-    borderWidth: 2,
-    borderRadius: 5,
-    marginTop: 10,
-    padding: 5,
-    fontSize: 17,
-    width: 310,
+    borderWidth: '0.2rem',
+    borderRadius: '0.6rem',
+    marginTop: '0.4rem',
+    padding: '0.2rem',
+    fontSize: '1rem',
+    width: '21rem',
   },
   modalButtonAddPhoto: {
-    //paddingHorizontal: 10,
-    marginTop: 10,
-    marginRight: 5,
-    padding: 5,
+    marginTop: '0.4rem',
+    marginRight: '0.6rem',
+    padding: '0.4rem',
     backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
+    borderWidth: '0.1rem',
+    borderRadius: '0.3rem',
     borderColor: Colors.black,
   },
   modalViewAddPhoto: {
@@ -199,81 +219,13 @@ const styles = StyleSheet.create({
     alignContent: 'space-between',
   },
   modalButtonAdd: {
-    paddingHorizontal: 5,
-    marginTop: 30,
-    padding: 5,
+    paddingHorizontal: '0.25rem',
+    marginTop: '1.6rem',
+    padding: '0.4rem',
     backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
+    borderWidth: '0.1rem',
+    borderRadius: '0.3rem',
     borderColor: Colors.black,
-    width: 200,
-  },
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-  // container: {
-  //   ...StyleSheet.absoluteFillObject,
-  //   height: 800,
-  //   width: 400,
-  //   justifyContent: 'flex-end',
-  //   alignItems: 'center',
-  // },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-    height: '100%',
-  },
-
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: 'black',
-  },
-  preview: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  capture: {
-    flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 15,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
-    margin: 20,
   },
 });
 
