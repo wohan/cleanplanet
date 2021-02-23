@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   SafeAreaView,
-  StyleSheet,
   ScrollView,
   View,
   Text,
@@ -12,13 +11,14 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import AddClearPointModal from '../components/AddClearPointModal';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
+import EStyleSheet from 'react-native-extended-stylesheet';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const delta = {
   latitudeDelta: 0.05,
@@ -117,7 +117,7 @@ const HomePage = ({storePoint, navigation}) => {
         coordinate={coordinatePoint}
         onDragEnd={(e) => setCoordinateNewPoint(e.nativeEvent.coordinate)}
         title="Укажите свалку">
-        <Callout style={{width: 200, flex: 1, position: 'absolute'}}>
+        <Callout style={styles.newPoint}>
           <Text>Перенесите на местоположение свалки</Text>
         </Callout>
       </Marker>
@@ -129,28 +129,23 @@ const HomePage = ({storePoint, navigation}) => {
 
     return (
       <Marker
-        draggable
         coordinate={{
           latitude: data.latitude,
           longitude: data.longitude,
         }}
         title={data.name}>
         <Callout
-          style={{width: 200, flex: 1, position: 'absolute'}}
+          style={styles.newPoint}
           onPress={() => navigation.navigate('Point', {point})}>
           <View>
-            <Text style={{fontSize: 15, fontWeight: '600'}}>Точка очистки</Text>
-            <Text style={{fontSize: 15, fontWeight: '600', paddingTop: 5}}>
-              Наименование:{' '}
-            </Text>
-            <Text style={{paddingBottom: 5}}>{data.name}</Text>
-            <Text style={{paddingTop: 5, fontSize: 15, fontWeight: '600'}}>
-              Описание:{' '}
-            </Text>
+            <Text style={styles.textCalloutValue}>Точка очистки</Text>
+            <Text style={styles.textCalloutValue}>Наименование: </Text>
+            <Text style={styles.paddingText}>{data.name}</Text>
+            <Text style={styles.textCalloutValue}>Описание: </Text>
             <Text>{data.description}</Text>
           </View>
           <TouchableHighlight style={styles.modalButtonAdd}>
-            <Text style={{fontSize: 17, textAlign: 'center'}}>Подробнее</Text>
+            <Text style={styles.textButtonCallout}>Подробнее</Text>
           </TouchableHighlight>
         </Callout>
       </Marker>
@@ -162,41 +157,22 @@ const HomePage = ({storePoint, navigation}) => {
       <StatusBar />
       <SafeAreaView>
         <View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                fontSize: 22,
-                paddingTop: 5,
-                paddingLeft: 10,
-                fontWeight: '600',
-                color: '#02cdfa',
-              }}>
-              Чистая Планета
-            </Text>
+          <View style={styles.containerHead}>
+            <Text style={styles.textHead}>Чистая Планета</Text>
             <Button
-              style={{paddingRight: 10, size: 21}}
               onPress={() => setShowMarkerAddPoint(true)}
               title={'Добавить точку'}
             />
           </View>
           {showMarkerAddPoint && (
             <View>
-              <View
-                style={{
-                  alignItems: 'center',
-                  backgroundColor: '#78e6ff',
-                }}>
-                <Text style={{margin: 10, fontWeight: '400', fontSize: 17}}>
+              <View style={styles.textMessageAddPointContainer}>
+                <Text style={styles.textMessageAddPoint}>
                   Перенесите указатель на место на карте где находится точка
                   очистки и добавьте описание.
                 </Text>
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
-                  backgroundColor: '#78e6ff',
-                }}>
+              <View style={styles.containerButton}>
                 <Button
                   onPress={() => {
                     setShowMarkerAddPoint(false);
@@ -204,7 +180,6 @@ const HomePage = ({storePoint, navigation}) => {
                   title="Отмена"
                 />
                 <Button
-                  style={{paddingRight: 5}}
                   onPress={() => {
                     setShowModalAddPoint(true);
                   }}
@@ -213,13 +188,13 @@ const HomePage = ({storePoint, navigation}) => {
               </View>
             </View>
           )}
-          <MapView style={{height: '100%'}} region={coordinatePoint}>
+          <MapView style={styles.mapViewContainer} region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
             {points.length > 0 &&
               points.map((point) => createMarkerPoint(point))}
           </MapView>
           <Modal
-            style={{alignContent: 'center'}}
+            style={styles.containerModal}
             animationType="slide"
             transparent={true}
             visible={showModalAddPoint}>
@@ -229,12 +204,7 @@ const HomePage = ({storePoint, navigation}) => {
               textStyle={styles.spinnerTextStyle}
               indicatorStyle={styles.spinnerTextStyle}
             />
-            <ScrollView
-              contentContainerStyle={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+            <ScrollView contentContainerStyle={styles.scrollModal}>
               <AddClearPointModal />
             </ScrollView>
           </Modal>
@@ -244,105 +214,74 @@ const HomePage = ({storePoint, navigation}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  modalCenter: {
+const styles = EStyleSheet.create({
+  modalButtonAdd: {
+    paddingHorizontal: '0.25rem',
+    marginTop: '0.8rem',
+    padding: '0.4rem',
+    backgroundColor: '#AFEEEE',
+    borderWidth: '0.1rem',
+    borderRadius: '0.3rem',
+    borderColor: Colors.black,
+  },
+  paddingText: {
+    paddingBottom: '0.2rem',
+  },
+  textButtonCallout: {
+    fontSize: '1.1rem',
+    textAlign: 'center',
+  },
+  textCalloutValue: {
+    fontSize: '0.95rem',
+    fontWeight: '600',
+    paddingTop: '0.2rem',
+  },
+  containerHead: {
+    marginBottom: '0.2rem',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  textHead: {
+    fontSize: '1.5rem',
+    paddingTop: '0.4rem',
+    paddingLeft: '0.8rem',
+    fontWeight: '600',
+    color: '#02cdfa',
+  },
+  textMessageAddPointContainer: {
+    alignItems: 'center',
+    backgroundColor: '#78e6ff',
+  },
+  textMessageAddPoint: {
+    margin: '0.5rem',
+    fontWeight: '400',
+    fontSize: '1rem',
+  },
+  mapViewContainer: {
+    height: '100%',
+  },
+  containerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#78e6ff',
+  },
+  newPoint: {
+    width: '12rem',
+    flex: 1,
+    position: 'absolute',
+  },
+  buttonClose: {
+    right: '-38%',
+    padding: '0.4rem',
+    borderRadius: '0.4rem',
+  },
+  scrollModal: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalView: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalItemInput: {
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
-  modalItemInputText: {
-    fontSize: 20,
-  },
-  modalItemInputTextInput: {
-    borderColor: '#AFEEEE',
-    borderWidth: 2,
-    borderRadius: 5,
-    marginTop: 10,
-    padding: 5,
-    fontSize: 17,
-  },
-  modalButtonAddPhoto: {
-    paddingHorizontal: 10,
-    marginTop: 10,
-    padding: 5,
-    backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: Colors.black,
-  },
-  modalViewAddPhoto: {
-    flexDirection: 'row',
+  containerModal: {
     alignContent: 'center',
-    justifyContent: 'space-between',
-  },
-  modalButtonAdd: {
-    zIndex: 1,
-    paddingHorizontal: 10,
-    marginTop: 10,
-    padding: 5,
-    backgroundColor: '#AFEEEE',
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: Colors.black,
-    width: '100%',
-  },
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    height: 800,
-    width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-    height: '100%',
   },
   spinnerTextStyle: {
     color: '#ff0000',

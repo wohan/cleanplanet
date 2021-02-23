@@ -3,56 +3,7 @@ import {SafeAreaView, View, Text, StatusBar, Button, Image} from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {inject, observer} from 'mobx-react';
-
-const styles = EStyleSheet.create({
-  containerHead: {
-    marginBottom: '0.8rem',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  textHead: {
-    fontSize: '1.5rem',
-    paddingTop: '0.4rem',
-    paddingLeft: '0.8rem',
-    fontWeight: '600',
-    color: '#02cdfa',
-  },
-  buttonBack: {
-    paddingRight: 30,
-  },
-  containerImage: {
-    height: '43.5%',
-  },
-  viewImages: {
-    marginTop: '0.8rem',
-    paddingTop: '0.8rem',
-    flexDirection: 'column',
-    alignItems: 'center',
-    alignContent: 'center',
-  },
-  image: {
-    width: '22rem',
-    height: '22rem',
-    borderRadius: '1rem',
-  },
-  container: {
-    backgroundColor: '#bbeaff',
-    margin: '0.8rem',
-    padding: '0.8rem',
-    borderRadius: '0.8rem',
-    height: '46%',
-  },
-  textNameFields: {
-    fontSize: '1.2rem',
-    fontWeight: '500',
-    paddingTop: 5,
-  },
-  textFields: {
-    fontSize: '1rem',
-    fontWeight: '300',
-    paddingTop: 5,
-  },
-});
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const PointPage = ({storePoint, navigation, route}) => {
   let [linksPhoto, setLinksPhoto] = React.useState([]);
@@ -110,5 +61,64 @@ const PointPage = ({storePoint, navigation, route}) => {
     </>
   );
 };
+
+const styles = EStyleSheet.create({
+  modalButtonAdd: {
+    paddingHorizontal: '0.25rem',
+    marginTop: '1.6rem',
+    padding: '0.4rem',
+    backgroundColor: '#AFEEEE',
+    borderWidth: '0.1rem',
+    borderRadius: '0.3rem',
+    borderColor: Colors.black,
+  },
+  containerHead: {
+    marginBottom: '0.8rem',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  textHead: {
+    fontSize: '1.5rem',
+    paddingTop: '0.4rem',
+    paddingLeft: '0.8rem',
+    fontWeight: '600',
+    color: '#02cdfa',
+  },
+  buttonBack: {
+    paddingRight: 30,
+  },
+  containerImage: {
+    height: '43.5%',
+  },
+  viewImages: {
+    marginTop: '0.8rem',
+    paddingTop: '0.8rem',
+    flexDirection: 'column',
+    alignItems: 'center',
+    alignContent: 'center',
+  },
+  image: {
+    width: '22rem',
+    height: '22rem',
+    borderRadius: '1rem',
+  },
+  container: {
+    backgroundColor: '#bbeaff',
+    margin: '0.8rem',
+    padding: '0.8rem',
+    borderRadius: '0.8rem',
+    height: '46%',
+  },
+  textNameFields: {
+    fontSize: '1.2rem',
+    fontWeight: '500',
+    paddingTop: 5,
+  },
+  textFields: {
+    fontSize: '1rem',
+    fontWeight: '300',
+    paddingTop: 5,
+  },
+});
 
 export default inject('storePoint')(observer(PointPage));
