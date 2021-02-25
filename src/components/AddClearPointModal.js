@@ -1,16 +1,11 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  Image,
-} from 'react-native';
+import {View, Text, TextInput, TouchableHighlight, Image} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {inject, observer} from 'mobx-react';
 import ImagePicker from 'react-native-image-picker';
 import {DismissKeyboardView} from './DismissKeyboardHOC';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const options = {
   title: 'Выберите изображение',
@@ -66,13 +61,12 @@ const AddClearPointModal = ({storePoint}) => {
             underlayColor={'rgb(230, 230, 240)'}
             style={styles.buttonClose}
             onPress={() => setShowModalAddPoint(false)}>
-            <Text
-              style={{
-                ...styles.modalItemInputText,
-                color: 'rgb(71, 124, 251)',
-              }}>
-              закрыть
-            </Text>
+            <Ionicons
+              name="close-outline"
+              color={'#194bb8'}
+              // style={{marginRight: 5}}
+              size={EStyleSheet.value('$iconSize')}
+            />
           </TouchableHighlight>
           <Text style={styles.textHeader}>Новая свалка</Text>
           <View style={styles.modalItemInput}>
@@ -137,7 +131,7 @@ const AddClearPointModal = ({storePoint}) => {
 
 const styles = EStyleSheet.create({
   buttonClose: {
-    right: '-38%',
+    right: '-45%',
     padding: '0.4rem',
     borderRadius: '0.4rem',
   },

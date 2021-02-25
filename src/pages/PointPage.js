@@ -1,9 +1,19 @@
 import React from 'react';
-import {SafeAreaView, View, Text, StatusBar, Button, Image} from 'react-native';
+import {
+  ActivityIndicator,
+  SafeAreaView,
+  View,
+  Text,
+  StatusBar,
+  Button,
+  Image,
+  TouchableHighlight,
+} from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {inject, observer} from 'mobx-react';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const PointPage = ({storePoint, navigation, route}) => {
   let [linksPhoto, setLinksPhoto] = React.useState([]);
@@ -33,14 +43,22 @@ const PointPage = ({storePoint, navigation, route}) => {
       <SafeAreaView>
         <View>
           <View style={styles.containerHead}>
+            <TouchableHighlight onPress={() => navigation.navigate('Home')}>
+              <View style={styles.viewBack}>
+                <Ionicons
+                  name="chevron-back-outline"
+                  color={'#194bb8'}
+                  size={EStyleSheet.value('$iconSize')}
+                />
+                <Text style={styles.textBackButton}>Карта</Text>
+              </View>
+            </TouchableHighlight>
             <Text style={styles.textHead}>Чистая Планета</Text>
-            <Button
-              style={styles.buttonBack}
-              onPress={() => navigation.navigate('Home')}
-              title={'Назад к карте'}
-            />
           </View>
           <View style={styles.containerImage}>
+            {!linksPhoto.length > 0 && (
+              <ActivityIndicator style={styles.loading} size="large" />
+            )}
             <Carousel
               style={styles.viewImages}
               layout={'default'}
@@ -63,6 +81,17 @@ const PointPage = ({storePoint, navigation, route}) => {
 };
 
 const styles = EStyleSheet.create({
+  loading: {
+    marginTop: '9rem',
+  },
+  viewBack: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textBackButton: {
+    color: '#194bb8',
+    fontSize: '1.4rem',
+  },
   modalButtonAdd: {
     paddingHorizontal: '0.25rem',
     marginTop: '1.6rem',
@@ -75,13 +104,14 @@ const styles = EStyleSheet.create({
   containerHead: {
     marginBottom: '0.8rem',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   textHead: {
     fontSize: '1.5rem',
-    paddingTop: '0.4rem',
-    paddingLeft: '0.8rem',
+    paddingLeft: '1.5rem',
+    left: '0%',
     fontWeight: '600',
+    textAlign: 'center',
     color: '#02cdfa',
   },
   buttonBack: {

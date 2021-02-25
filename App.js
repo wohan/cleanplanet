@@ -14,6 +14,9 @@ EStyleSheet.build({
   $textColor: '#0275d8',
   $sliderWidth: '26rem',
   $itemWidth: '22.2rem',
+  $iconSize: '2.2rem',
+  // $sliderWidth: '25rem',
+  // $itemWidth: '21.2rem',
   $rem: width > 376 ? (width > 415 ? 17 : 16) : 14,
 });
 

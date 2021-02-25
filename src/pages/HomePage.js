@@ -9,6 +9,7 @@ import {
   Modal,
   Platform,
   TouchableHighlight,
+  ActivityIndicator,
 } from 'react-native';
 import AddClearPointModal from '../components/AddClearPointModal';
 import MapView, {Marker, Callout} from 'react-native-maps';
@@ -19,6 +20,7 @@ import {PERMISSIONS, request} from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const delta = {
   latitudeDelta: 0.05,
@@ -159,9 +161,12 @@ const HomePage = ({storePoint, navigation}) => {
         <View>
           <View style={styles.containerHead}>
             <Text style={styles.textHead}>Чистая Планета</Text>
-            <Button
+            <Ionicons
+              name="add-outline"
+              color={'#194bb8'}
+              style={styles.iconAdd}
+              size={EStyleSheet.value('$iconSize')}
               onPress={() => setShowMarkerAddPoint(true)}
-              title={'Добавить точку'}
             />
           </View>
           {showMarkerAddPoint && (
@@ -186,6 +191,12 @@ const HomePage = ({storePoint, navigation}) => {
                   title="Добавить свалку"
                 />
               </View>
+            </View>
+          )}
+          {!points.length > 0 && (
+            <View style={styles.viewLoading}>
+              <ActivityIndicator size="small" />
+              <Text style={styles.textLoading}>Загрузка точек</Text>
             </View>
           )}
           <MapView style={styles.mapViewContainer} region={coordinatePoint}>
@@ -215,6 +226,17 @@ const HomePage = ({storePoint, navigation}) => {
 };
 
 const styles = EStyleSheet.create({
+  viewLoading: {
+    flexDirection: 'row',
+    paddingLeft: '0.4rem',
+    paddingBottom: '0.4rem',
+  },
+  textLoading: {
+    paddingLeft: '0.4rem',
+  },
+  iconAdd: {
+    marginRight: '0.2rem',
+  },
   modalButtonAdd: {
     paddingHorizontal: '0.25rem',
     marginTop: '0.8rem',
@@ -237,14 +259,14 @@ const styles = EStyleSheet.create({
     paddingTop: '0.2rem',
   },
   containerHead: {
-    marginBottom: '0.2rem',
+    marginBottom: '0.8rem',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   textHead: {
     fontSize: '1.5rem',
     paddingTop: '0.4rem',
-    paddingLeft: '0.8rem',
+    paddingLeft: '7.2rem',
     fontWeight: '600',
     color: '#02cdfa',
   },
