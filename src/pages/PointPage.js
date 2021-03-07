@@ -109,7 +109,6 @@ const styles = EStyleSheet.create({
   textHead: {
     fontSize: '1.5rem',
     paddingLeft: '1.5rem',
-    left: '0%',
     fontWeight: '600',
     textAlign: 'center',
     color: '#02cdfa',
@@ -118,7 +117,7 @@ const styles = EStyleSheet.create({
     paddingRight: 30,
   },
   containerImage: {
-    height: '43.5%',
+    height: '46.5%',
   },
   viewImages: {
     marginTop: '0.8rem',
@@ -137,7 +136,7 @@ const styles = EStyleSheet.create({
     margin: '0.8rem',
     padding: '0.8rem',
     borderRadius: '0.8rem',
-    height: '46%',
+    height: '43%',
   },
   textNameFields: {
     fontSize: '1.2rem',
