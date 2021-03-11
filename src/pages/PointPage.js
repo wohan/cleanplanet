@@ -5,15 +5,13 @@ import {
   View,
   Text,
   StatusBar,
-  Button,
-  Image,
   TouchableHighlight,
 } from 'react-native';
-import Carousel from 'react-native-snap-carousel';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {inject, observer} from 'mobx-react';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {FlatListSlider} from 'react-native-flatlist-slider';
 
 const PointPage = ({storePoint, navigation, route}) => {
   let [linksPhoto, setLinksPhoto] = React.useState([]);
@@ -24,7 +22,7 @@ const PointPage = ({storePoint, navigation, route}) => {
       let linksPhotoArray = [];
       data.photos.forEach((link) => {
         storePoint.getLinkImage(link).then((linkImage) => {
-          linksPhotoArray.push(linkImage);
+          linksPhotoArray.push({image: linkImage});
           if (linksPhotoArray.length === data.photos.length) {
             setLinksPhoto(linksPhotoArray);
           }
@@ -32,10 +30,6 @@ const PointPage = ({storePoint, navigation, route}) => {
       });
     }
   }, []);
-
-  const renderItem = ({item}) => {
-    return <Image style={styles.image} source={{uri: item}} />;
-  };
 
   return (
     <>
@@ -59,14 +53,15 @@ const PointPage = ({storePoint, navigation, route}) => {
             {!linksPhoto.length > 0 && (
               <ActivityIndicator style={styles.loading} size="large" />
             )}
-            <Carousel
-              style={styles.viewImages}
-              layout={'default'}
-              data={linksPhoto}
-              renderItem={renderItem}
-              sliderWidth={EStyleSheet.value('$sliderWidth')}
-              itemWidth={EStyleSheet.value('$itemWidth')}
-            />
+            {linksPhoto.length > 0 && (
+              <FlatListSlider
+                height={EStyleSheet.value('$itemWidth')}
+                data={linksPhoto}
+                indicatorContainerStyle={{position: 'absolute', bottom: 20}}
+                imageKey={'image'}
+                autoscroll={false}
+              />
+            )}
           </View>
           <View style={styles.container}>
             <Text style={styles.textNameFields}>Наименование: </Text>
@@ -125,11 +120,6 @@ const styles = EStyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     alignContent: 'center',
-  },
-  image: {
-    width: '22rem',
-    height: '22rem',
-    borderRadius: '1rem',
   },
   container: {
     backgroundColor: '#bbeaff',
