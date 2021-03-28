@@ -58,6 +58,7 @@ const PointPage = ({storePoint, navigation, route}) => {
                 height={EStyleSheet.value('$itemWidth')}
                 data={linksPhoto}
                 indicatorContainerStyle={{position: 'absolute', bottom: 20}}
+                onPress={(item) => () => {}}
                 imageKey={'image'}
                 autoscroll={false}
               />
@@ -103,7 +104,7 @@ const styles = EStyleSheet.create({
   },
   textHead: {
     fontSize: '1.5rem',
-    paddingLeft: '1.5rem',
+    paddingLeft: '1.25rem',
     fontWeight: '600',
     textAlign: 'center',
     color: '#02cdfa',
