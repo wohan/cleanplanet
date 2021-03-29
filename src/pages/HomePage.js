@@ -8,10 +8,10 @@ import {
   Button,
   Modal,
   Platform,
-  TouchableHighlight,
+  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import AddClearPointModal from '../components/AddClearPointModal';
+import AddClearPointModal from './components/AddClearPointModal';
 import MapView, {Marker, Callout} from 'react-native-maps';
 import {inject, observer} from 'mobx-react';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -19,8 +19,9 @@ import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CreateMarkerPoint from './components/CreateMarkerPoint';
+import * as colors from '../assets/colors';
 
 const delta = {
   latitudeDelta: 0.05,
@@ -126,34 +127,6 @@ const HomePage = ({storePoint, navigation}) => {
     );
   };
 
-  const createMarkerPoint = (point) => {
-    const {data, id} = point;
-
-    return (
-      <Marker
-        coordinate={{
-          latitude: data.latitude,
-          longitude: data.longitude,
-        }}
-        title={data.name}>
-        <Callout
-          style={styles.newPoint}
-          onPress={() => navigation.navigate('Point', {point})}>
-          <View>
-            <Text style={styles.textCalloutValue}>Точка очистки</Text>
-            <Text style={styles.textCalloutValue}>Наименование: </Text>
-            <Text style={styles.paddingText}>{data.name}</Text>
-            <Text style={styles.textCalloutValue}>Описание: </Text>
-            <Text>{data.description}</Text>
-          </View>
-          <TouchableHighlight style={styles.modalButtonAdd}>
-            <Text style={styles.textButtonCallout}>Подробнее</Text>
-          </TouchableHighlight>
-        </Callout>
-      </Marker>
-    );
-  };
-
   return (
     <>
       <StatusBar />
@@ -161,13 +134,14 @@ const HomePage = ({storePoint, navigation}) => {
         <View>
           <View style={styles.containerHead}>
             <Text style={styles.textHead}>Чистая Планета</Text>
-            <Ionicons
-              name="add-outline"
-              color={'#194bb8'}
-              style={styles.iconAdd}
-              size={EStyleSheet.value('$iconSize')}
-              onPress={() => setShowMarkerAddPoint(true)}
-            />
+            <TouchableOpacity onPress={() => setShowMarkerAddPoint(true)}>
+              <Ionicons
+                name="add-outline"
+                color={colors.blueDark}
+                style={styles.iconAdd}
+                size={EStyleSheet.value('$iconSize')}
+              />
+            </TouchableOpacity>
           </View>
           {showMarkerAddPoint && (
             <View>
@@ -195,14 +169,16 @@ const HomePage = ({storePoint, navigation}) => {
           )}
           {!points.length > 0 && (
             <View style={styles.viewLoading}>
-              <ActivityIndicator size="small" />
-              <Text style={styles.textLoading}>Загрузка точек</Text>
+              <ActivityIndicator size="small" color={colors.blueDark} />
+              <Text style={styles.textLoading}>Загрузка точек...</Text>
             </View>
           )}
           <MapView style={styles.mapViewContainer} region={coordinatePoint}>
             {showMarkerAddPoint && createMarkerAddNewPoint()}
             {points.length > 0 &&
-              points.map((point) => createMarkerPoint(point))}
+              points.map((point) => (
+                <CreateMarkerPoint point={point} navigation={navigation} />
+              ))}
           </MapView>
           <Modal
             style={styles.containerModal}
@@ -230,49 +206,31 @@ const styles = EStyleSheet.create({
     flexDirection: 'row',
     paddingLeft: '0.4rem',
     paddingBottom: '0.4rem',
+    backgroundColor: colors.pinkLight,
   },
   textLoading: {
     paddingLeft: '0.4rem',
   },
   iconAdd: {
-    marginRight: '0.2rem',
-  },
-  modalButtonAdd: {
-    paddingHorizontal: '0.25rem',
-    marginTop: '0.8rem',
-    padding: '0.4rem',
-    backgroundColor: '#AFEEEE',
-    borderWidth: '0.1rem',
-    borderRadius: '0.3rem',
-    borderColor: Colors.black,
-  },
-  paddingText: {
-    paddingBottom: '0.2rem',
-  },
-  textButtonCallout: {
-    fontSize: '1.1rem',
-    textAlign: 'center',
-  },
-  textCalloutValue: {
-    fontSize: '0.95rem',
-    fontWeight: '600',
-    paddingTop: '0.2rem',
+    marginRight: '0.4rem',
   },
   containerHead: {
-    marginBottom: '0.8rem',
+    paddingTop: '0.4rem',
+    paddingBottom: '0.4rem',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.pinkLight,
   },
   textHead: {
     fontSize: '1.5rem',
-    paddingTop: '0.4rem',
     paddingLeft: '7.2rem',
-    fontWeight: '600',
-    color: '#02cdfa',
+    fontWeight: '800',
+    color: colors.blueFont,
   },
   textMessageAddPointContainer: {
     alignItems: 'center',
-    backgroundColor: '#78e6ff',
+    backgroundColor: colors.blueLight,
   },
   textMessageAddPoint: {
     margin: '0.5rem',
@@ -285,7 +243,7 @@ const styles = EStyleSheet.create({
   containerButton: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#78e6ff',
+    backgroundColor: colors.blueLight,
   },
   newPoint: {
     width: '12rem',
@@ -306,7 +264,7 @@ const styles = EStyleSheet.create({
     alignContent: 'center',
   },
   spinnerTextStyle: {
-    color: '#ff0000',
+    color: colors.red,
   },
 });
 

@@ -2,10 +2,11 @@ import React from 'react';
 import {View, Text, TextInput, TouchableHighlight, Image} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {inject, observer} from 'mobx-react';
-import ImagePicker from 'react-native-image-picker';
+import {launchCamera} from 'react-native-image-picker';
 import {DismissKeyboardView} from './DismissKeyboardHOC';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as colors from '../../assets/colors';
 
 const options = {
   title: 'Выберите изображение',
@@ -35,7 +36,7 @@ const AddClearPointModal = ({storePoint}) => {
   };
 
   const addPhotos = () => {
-    ImagePicker.showImagePicker(options, (response) => {
+    launchCamera(options, (response) => {
       if (!response.cancelled && response.uri) {
         setShowEmptyImages(false);
         setUriPhotos([...uriPhotos, response.uri]);
@@ -63,8 +64,7 @@ const AddClearPointModal = ({storePoint}) => {
             onPress={() => setShowModalAddPoint(false)}>
             <Ionicons
               name="close-outline"
-              color={'#194bb8'}
-              // style={{marginRight: 5}}
+              color={colors.blueDark}
               size={EStyleSheet.value('$iconSize')}
             />
           </TouchableHighlight>
@@ -190,11 +190,11 @@ const styles = EStyleSheet.create({
     justifyContent: 'space-between',
   },
   modalItemInputTextInput: {
-    borderColor: '#AFEEEE',
+    borderColor: colors.blueSuperLight,
     borderWidth: '0.2rem',
     borderRadius: '0.6rem',
     marginTop: '0.4rem',
-    padding: '0.2rem',
+    padding: '0.4rem',
     fontSize: '1rem',
     width: '21rem',
   },
@@ -202,7 +202,7 @@ const styles = EStyleSheet.create({
     marginTop: '0.4rem',
     marginRight: '0.6rem',
     padding: '0.4rem',
-    backgroundColor: '#AFEEEE',
+    backgroundColor: colors.blueSuperLight,
     borderWidth: '0.1rem',
     borderRadius: '0.3rem',
     borderColor: Colors.black,
@@ -216,7 +216,7 @@ const styles = EStyleSheet.create({
     paddingHorizontal: '0.25rem',
     marginTop: '1.6rem',
     padding: '0.4rem',
-    backgroundColor: '#AFEEEE',
+    backgroundColor: colors.blueSuperLight,
     borderWidth: '0.1rem',
     borderRadius: '0.3rem',
     borderColor: Colors.black,

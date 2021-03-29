@@ -5,6 +5,7 @@ import {
   View,
   Text,
   StatusBar,
+  ScrollView,
   TouchableHighlight,
 } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -12,6 +13,7 @@ import {inject, observer} from 'mobx-react';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {FlatListSlider} from 'react-native-flatlist-slider';
+import * as colors from '../assets/colors';
 
 const PointPage = ({storePoint, navigation, route}) => {
   let [linksPhoto, setLinksPhoto] = React.useState([]);
@@ -41,7 +43,7 @@ const PointPage = ({storePoint, navigation, route}) => {
               <View style={styles.viewBack}>
                 <Ionicons
                   name="chevron-back-outline"
-                  color={'#194bb8'}
+                  color={colors.blueDark}
                   size={EStyleSheet.value('$iconSize')}
                 />
                 <Text style={styles.textBackButton}>Карта</Text>
@@ -68,7 +70,9 @@ const PointPage = ({storePoint, navigation, route}) => {
             <Text style={styles.textNameFields}>Наименование: </Text>
             <Text style={styles.textFields}>{data.name}</Text>
             <Text style={styles.textNameFields}>Описание: </Text>
-            <Text style={styles.textFields}>{data.description}</Text>
+            <ScrollView>
+              <Text style={styles.textFields}>{data.description}</Text>
+            </ScrollView>
           </View>
         </View>
       </SafeAreaView>
@@ -85,20 +89,12 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
   },
   textBackButton: {
-    color: '#194bb8',
-    fontSize: '1.4rem',
-  },
-  modalButtonAdd: {
-    paddingHorizontal: '0.25rem',
-    marginTop: '1.6rem',
-    padding: '0.4rem',
-    backgroundColor: '#AFEEEE',
-    borderWidth: '0.1rem',
-    borderRadius: '0.3rem',
-    borderColor: Colors.black,
+    color: colors.blueDark,
+    fontSize: '1.1rem',
   },
   containerHead: {
-    marginBottom: '0.8rem',
+    marginBottom: '0.4rem',
+    marginTop: '0.4rem',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -107,23 +103,13 @@ const styles = EStyleSheet.create({
     paddingLeft: '1.25rem',
     fontWeight: '600',
     textAlign: 'center',
-    color: '#02cdfa',
-  },
-  buttonBack: {
-    paddingRight: 30,
+    color: colors.blueFont,
   },
   containerImage: {
     height: '46.5%',
   },
-  viewImages: {
-    marginTop: '0.8rem',
-    paddingTop: '0.8rem',
-    flexDirection: 'column',
-    alignItems: 'center',
-    alignContent: 'center',
-  },
   container: {
-    backgroundColor: '#bbeaff',
+    backgroundColor: colors.blueSuperLight,
     margin: '0.8rem',
     padding: '0.8rem',
     borderRadius: '0.8rem',
